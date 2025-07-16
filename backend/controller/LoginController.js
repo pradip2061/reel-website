@@ -25,8 +25,8 @@ try {
     console.log(token)
     res.cookie('token', token, {
   httpOnly: true,
-  secure: true, // since no HTTPS in development
-  sameSite: 'lax'
+  secure: true,        // true if using HTTPS in production
+  sameSite: 'none',
 });   
 
     res.status(200).json({message:'login successfully!'})
