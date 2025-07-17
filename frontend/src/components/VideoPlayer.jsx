@@ -94,7 +94,7 @@ const VideoCard = ({ video }) => {
   return (
     <div
       ref={containerRef}
-      className="w-full h-full flex items-center justify-center bg-black"
+      className="w-full h-full flex items-center justify-center bg-black "
     >
       <div className="relative w-full h-full max-w-md mx-auto bg-black text-white overflow-hidden">
         {/* Video Element */}
@@ -104,7 +104,7 @@ const VideoCard = ({ video }) => {
           muted={muted}
           loop
           playsInline
-          className="w-full h-full object-cover cursor-pointer"
+          className="w-full h-full object-contain cursor-pointer"
           onClick={handlePlayPause}
           crossOrigin="anonymous"
           preload="metadata"
@@ -121,7 +121,7 @@ const VideoCard = ({ video }) => {
         </div>
 
         {/* Right Side Buttons */}
-        <div className="absolute bottom-32 right-4 flex flex-col items-center space-y-4 z-10">
+        <div className="absolute bottom-44 right-4 flex flex-col items-center space-y-4 z-10">
           <button
             onClick={() => setLiked(!liked)}
             className="flex flex-col items-center"
@@ -145,7 +145,7 @@ const VideoCard = ({ video }) => {
         </div>
 
         {/* Bottom Left Info */}
-        <div className="absolute bottom-24 lg:bottom-10 left-4 z-10 flex items-center space-x-3">
+        <div className="absolute bottom-32 lg:bottom-10 left-4 z-10 flex items-center space-x-3">
           <img
             src={video.profilepic || "https://via.placeholder.com/40"}
             alt=""
@@ -158,7 +158,7 @@ const VideoCard = ({ video }) => {
         </div>
 
         {/* Seek Bar */}
-        <div className="absolute w-full px-4 bottom-16 lg:bottom-5 z-10">
+        <div className="absolute w-full px-4 bottom-24 lg:bottom-5 z-10">
           <input
             type="range"
             min="0"

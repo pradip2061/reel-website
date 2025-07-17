@@ -2,21 +2,26 @@ import React, { useEffect, useRef, useState } from "react";
 import VideoCard from "../components/VideoPlayer";
 import { useDispatch, useSelector } from "react-redux";
 import { getvideoThunk } from "../../store/getvideo/getvideoThunk";
-
-
-
+import { showMoreVideos } from "../../store/getvideo/getvideoSlice";
 
 const Home = () => {
   const containerRef = useRef(null);
+  const dispatch = useDispatch();
+
+  const videos = useSelector((state) => state.getvideo.videos);
+  const visibleCount = useSelector((state) => state.getvideo.visibleCount);
   const [visibleIndex, setVisibleIndex] = useState(0);
-  const dispatch= useDispatch()
-  const videos =useSelector((state)=>state.getvideo.videos)
-  const[category,setCategory]=useState("All")
-  console.log(videos)
-  useEffect(()=>{
-    console.log("hello")
-    dispatch(getvideoThunk(category))
-},[category,dispatch])
+  const [category, setCategory] = useState("All");
+
+  useEffect(() => {
+    dispatch(getvideoThunk(category));
+  }, [category, dispatch]);
+
+  const visibleVideos = videos.slice(0, visibleCount);
+
+  const handleLoadMore = () => {
+    dispatch(showMoreVideos());
+  };
 
   useEffect(() => {
     const options = {
@@ -39,21 +44,33 @@ const Home = () => {
     return () => {
       elements.forEach((el) => observer.unobserve(el));
     };
-  }, []);
+  }, [visibleVideos.length]);
 
   return (
     <div
       ref={containerRef}
       className="h-screen overflow-y-scroll snap-y snap-mandatory"
     >
-      {videos.map((video, index) => (
+      {visibleVideos.map((video, index) => (
         <div
-          key={video.id}
-          className="video-slide snap-start snap-always"
+          key={video._id}
+          className="video-slide snap-start snap-always relative"
           data-index={index}
           style={{ height: "100vh" }}
         >
           <VideoCard video={video} active={index === visibleIndex} />
+
+          {/* ✅ Show Load More button only in the last visible video */}
+          {index === visibleVideos.length - 1 && visibleCount < videos.length && (
+            <div className="absolute bottom-44 left-1/2 transform -translate-x-1/2">
+              <button
+                onClick={handleLoadMore}
+                className="text-white bg-pink-600 px-4 py-2 rounded-md"
+              >
+                Load More
+              </button>
+            </div>
+          )}
         </div>
       ))}
     </div>

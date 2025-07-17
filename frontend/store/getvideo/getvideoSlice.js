@@ -6,15 +6,24 @@ initialState:{
     error:null,
     status:null,
     message:"",
-    videos:[]
+    videos:[],
+     visibleCount: 4,
 },
 reducers:{
-    resetdata:(state)=>{
-        state.error=null
-          state.status=null
-            state.message="",
-            state.videos=[]
-    }
+       setvideos: (state, action) => {
+      state.videos = action.payload;
+      state.visibleCount = 4;  // reset visible count on new fetch
+    },
+    showMoreVideos: (state) => {
+      state.visibleCount += 4; // show 4 more videos
+      if (state.visibleCount > state.videos.length) {
+        state.visibleCount = state.videos.length; // cap to max length
+      }
+    },
+    resetVideos: (state) => {
+      state.videos = [];
+      state.visibleCount = 4;
+    },
 },
 extraReducers:(builder)=>{
 builder.addCase(getvideoThunk.pending,(state,action)=>{
@@ -33,5 +42,5 @@ state.message = ""
 }
 })
 
-export const {resetdata} = getvideo.actions
+export const {setvideos,showMoreVideos,resetVideos} = getvideo.actions
 export default getvideo.reducer
