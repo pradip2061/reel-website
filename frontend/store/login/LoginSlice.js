@@ -20,9 +20,10 @@ state.error="",
 state.status = 'pending',
 state.message = ""
 }).addCase(loginThunk.fulfilled,(state,action)=>{
+    localStorage.setItem('userid',action.payload.id)
 state.error="",
 state.status = 'success',
-state.message = action.payload
+state.message = action.payload.message
 localStorage.setItem('isLogin', 'true');
 }).addCase(loginThunk.rejected,(state,action)=>{
 state.error= action.payload,

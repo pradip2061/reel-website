@@ -43,26 +43,35 @@ const formattedDate = today.toLocaleDateString('en-US', {
 
 const getvideo = async (req, res) => {
   try {
-    const { category } = req.query;
-    console.log(category)
+    const { category, page , limit} = req.query;
     if (!category) {
       return res.status(400).json({ message: "Category is missing!" });
     }
 
-    let videos;
+    const pageNumber = parseInt(page);
+    const limitNumber = parseInt(limit);
+    const skip = (pageNumber - 1) * limitNumber;
+
+    let videos, totalVideos;
 
     if (category === "All") {
-      videos = await video.find();
+      totalVideos = await video.countDocuments();
+      videos = await video.find().skip(skip).limit(limitNumber);
     } else {
-      videos = await video.find({ category });
+      totalVideos = await video.countDocuments({ category });
+      videos = await video.find({ category }).skip(skip).limit(limitNumber);
     }
-
-    return res.status(200).json({ videos });
+    return res.status(200).json({
+      videos,
+      totalPages: Math.ceil(totalVideos / limitNumber),
+      currentPage: pageNumber,
+    });
   } catch (error) {
     console.error("Error fetching videos:", error);
     return res.status(500).json({ message: "Server error" });
   }
 };
+
 
 
 module.exports = {videocreate,getvideo};

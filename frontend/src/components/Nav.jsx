@@ -80,7 +80,7 @@ const Nav = () => {
 
       {/* Mobile Bottom Tab Bar */}
       <div className="md:hidden fixed z-20 bottom-0 left-0 w-full bg-black  flex justify-between px-8 py-2 text-white">
-        <button className="flex flex-col items-center text-xs" onClick={()=>navigate('/')}>
+        <button className="flex flex-col items-center text-xs" onClick={()=>navigate('/home')}>
           <Home size={20} />
           <span>Home</span>
         </button>

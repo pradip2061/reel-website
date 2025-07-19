@@ -19,7 +19,8 @@ Name:{
   },
   profilepic:{
     type:String
-  }
+  },
+  likedvideos:[String]
 }, { timestamps: true });
 
 const Sign = mongoose.model('Sign', schema);

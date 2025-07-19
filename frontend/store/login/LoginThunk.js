@@ -14,7 +14,7 @@ import axios from 'axios'
   }
 );
     if(response.status == 200){
-        return response.data.message
+        return response.data
     }
  } catch (error) {
     return rejectWithValue(error.response.data.message)

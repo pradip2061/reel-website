@@ -30,6 +30,9 @@ const schema = new mongoose.Schema({
       message:{
         type:String
       },
+      Name:{
+        type:String
+      },
       reply:[{
         userid:{
             type:String
@@ -39,7 +42,13 @@ const schema = new mongoose.Schema({
         },
         profilepic:{
             type:String
-        }
+        },
+        message:{
+          type:String
+        },
+         createdAt: {
+    type: Date,
+  },
       }]
     },
   ],

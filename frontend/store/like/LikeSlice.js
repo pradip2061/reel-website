@@ -5,12 +5,14 @@ name:'like',
 initialState:{
     error:"",
     status:null,
-    isliked:null
+    isliked:null,
+    likevideos:[]
 },
 reducers:{
     setdataLike:(state,action)=>{
+        console.log(action,"slice")
         state.error=""
-            state.isliked=action.payload
+            state.likevideos=action.payload
     }
 },
 extraReducers:(builder)=>{
@@ -20,7 +22,7 @@ state.status = 'pending'
 }).addCase(likeThunk.fulfilled,(state,action)=>{
 state.error="",
 state.status = 'success'
-state.isliked = action.payload
+state.likevideos = action.payload
 }).addCase(likeThunk.rejected,(state,action)=>{
 state.error= action.payload,
 state.status = 'failed'

@@ -59,9 +59,14 @@ export default function LoginSignup() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      setIsLoading(true);
       if (mode === "signup") {
+        if(!formData.profilepic){
+          toast.error('select the profile image')
+          return 
+        }
+          setIsLoading(true);
         await dispatch(signupThunk(formData));
         dispatch(resetdata());
         setFormData({
@@ -74,9 +79,10 @@ export default function LoginSignup() {
         });
         setMode("login");
       } else {
+          setIsLoading(true);
         await dispatch(loginThunk(formData));
         dispatch(resetdataLogin());
-        navigate("/", { replace: true });
+        navigate("/home", { replace: true });
       }
       setIsLoading(false);
     } catch (error) {
@@ -98,7 +104,7 @@ export default function LoginSignup() {
   }, [messageSignup, errorSignup, messageLogin, errorLogin]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50 lg:pt-20">
+    <div className="min-h-screen bg-gray-300  pt-20">
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="bg-white rounded-2xl shadow-xl p-6 space-y-6">
           <div className="flex bg-gray-100 rounded-xl p-1">
@@ -106,7 +112,7 @@ export default function LoginSignup() {
               onClick={() => setMode("login")}
               className={`flex-1 py-3 rounded-lg font-semibold ${
                 mode === "login"
-                  ? "bg-white text-blue-600 shadow"
+                  ? "bg-white text-pink-500 shadow"
                   : "text-gray-600"
               }`}
             >
@@ -116,7 +122,7 @@ export default function LoginSignup() {
               onClick={() => setMode("signup")}
               className={`flex-1 py-3 rounded-lg font-semibold ${
                 mode === "signup"
-                  ? "bg-white text-blue-600 shadow"
+                  ? "bg-white text-pink-500 shadow"
                   : "text-gray-600"
               }`}
             >
@@ -136,7 +142,7 @@ export default function LoginSignup() {
                     value={formData.firstName}
                     onChange={handleInputChange}
                     required
-                    className="w-full pl-10 py-3 border rounded-xl focus:ring-blue-500 focus:outline-none"
+                    className="w-full pl-10 py-3 border rounded-xl focus:ring-pink-500 focus:outline-none"
                   />
                 </div>
                 <div className="relative">
@@ -148,7 +154,7 @@ export default function LoginSignup() {
                     value={formData.lastName}
                     onChange={handleInputChange}
                     required
-                    className="w-full pl-10 py-3 border rounded-xl focus:ring-blue-500 focus:outline-none"
+                    className="w-full pl-10 py-3 border rounded-xl focus:ring-pink-500 focus:outline-none"
                   />
                 </div>
               </div>
@@ -163,7 +169,7 @@ export default function LoginSignup() {
                 value={formData.email}
                 onChange={handleInputChange}
                 required
-                className="w-full pl-10 py-3 border rounded-xl focus:ring-blue-500 focus:outline-none"
+                className="w-full pl-10 py-3 border rounded-xl focus:ring-pink-500 focus:outline-none"
               />
             </div>
 
@@ -176,7 +182,7 @@ export default function LoginSignup() {
                 value={formData.password}
                 onChange={handleInputChange}
                 required
-                className="w-full pl-10 pr-10 py-3 border rounded-xl focus:ring-blue-500 focus:outline-none"
+                className="w-full pl-10 pr-10 py-3 border rounded-xl focus:ring-pink-500 focus:outline-none"
               />
               <button
                 type="button"
@@ -197,13 +203,6 @@ export default function LoginSignup() {
                     ref={fileInputRef}
                     hidden
                   />
-                  <button
-                    type="button"
-                    onClick={handleButtonClick}
-                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                  >
-                    Upload Profile Image
-                  </button>
                   {formData.profilepic && (
                     <p className="text-sm mt-1 text-gray-500">
                       Selected: {formData.profilepic.name}
@@ -220,7 +219,7 @@ export default function LoginSignup() {
                     value={formData.confirmPassword}
                     onChange={handleInputChange}
                     required
-                    className="w-full pl-10 pr-10 py-3 border rounded-xl focus:ring-blue-500 focus:outline-none"
+                    className="w-full pl-10 pr-10 py-3 border rounded-xl focus:ring-pink-500 focus:outline-none"
                   />
                   <button
                     type="button"
@@ -231,13 +230,20 @@ export default function LoginSignup() {
                   >
                     {showConfirmPassword ? <EyeOff /> : <Eye />}
                   </button>
+                    <button
+                    type="button"
+                    onClick={handleButtonClick}
+                    className="bg-pink-500 text-white px-4 py-2  mt-5 rounded hover:bg-pink-600"
+                  >
+                    Upload Profile Image
+                  </button>
                 </div>
               </>
             )}
 
             {mode === "login" && (
               <div className="text-right text-sm">
-                <a href="#" className="text-blue-600">
+                <a href="#" className="text-pink-600">
                   Forgot Password?
                 </a>
               </div>
@@ -246,7 +252,7 @@ export default function LoginSignup() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold transition-all duration-200"
+              className="w-full bg-pink-500 hover:bg-pink-700 text-white py-3 rounded-xl font-semibold transition-all duration-200"
             >
               {isLoading ? (
                 <div className="flex justify-center items-center space-x-2">

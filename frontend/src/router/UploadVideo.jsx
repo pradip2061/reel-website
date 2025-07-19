@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Upload } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const UploadVideo = () => {
   const navigate = useNavigate();
@@ -9,7 +10,7 @@ const UploadVideo = () => {
   const [videoFile, setVideoFile] = useState(null);
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('');
-
+const isLogin = localStorage.getItem('isLogin')
   const categories = [
     { label: 'funny', emoji: '😄' },
     { label: 'education', emoji: '📚' },
@@ -27,8 +28,13 @@ const UploadVideo = () => {
 
   const handleSubmit = async () => {
     if (!videoFile || !title || !category) {
-      alert('Please fill all required fields.');
+      toast.error('Please fill all required fields.');
       return;
+    }
+
+    if(!isLogin){
+      toast.info("first login your account.")
+      return 
     }
 
     const formData = new FormData();
@@ -50,7 +56,7 @@ const UploadVideo = () => {
       );
       console.log(res.data);
       alert('Video uploaded successfully!');
-      navigate('/');
+      navigate('/',{replace:true});
     } catch (error) {
       console.error(error);
       alert('Video upload failed!');
@@ -66,7 +72,7 @@ const UploadVideo = () => {
           <h2 className="text-3xl font-bold text-black text-center w-full">
             Upload Video
           </h2>
-          <h1 onClick={() => navigate('/')} className="cursor-pointer text-xl font-bold">X</h1>
+          <h1 onClick={() => navigate('/home',{replace:true})} className="cursor-pointer text-xl font-bold">X</h1>
         </div>
 
         <form className="space-y-6">

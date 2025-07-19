@@ -25,11 +25,11 @@ try {
     console.log(token)
     res.cookie('token', token, {
   httpOnly: true,
-  secure: true,        // true if using HTTPS in production
-  sameSite: 'none',
+    secure: true, // true in production
+    sameSite: 'Strict',
 });   
 
-    res.status(200).json({message:'login successfully!'})
+    res.status(200).json({message:'login successfully!',id:userinfo._id})
 } catch (error) {
     console.log(error)
 }
@@ -38,8 +38,8 @@ const logout =async(req,res)=>{
     try {
         res.clearCookie('token', {
     httpOnly: true,
-    secure: false, // true in production
-    sameSite: 'lax',
+    secure: true, // true in production
+    sameSite: 'Strict',
   });
   res.status(200).json({ message: 'Logged out successfully' });
     } catch (error) {
