@@ -11,6 +11,7 @@ const getvideo = createSlice({
     currentPage: 1,
     totalPages: 0,
     limit: 4,
+    category: "all",  // add default category here, lowercase recommended
   },
   reducers: {
     setVideos: (state, action) => {
@@ -36,6 +37,16 @@ const getvideo = createSlice({
     setPage: (state, action) => {
       state.currentPage = action.payload;
     },
+    setCategory: (state, action) => {
+      // Only change if different to avoid unnecessary reset
+      if (state.category !== action.payload) {
+        console.log(action.payload)
+        state.category = action.payload;
+        state.videos = [];
+        state.currentPage = 1;
+        state.totalPages = 0;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -48,8 +59,10 @@ const getvideo = createSlice({
         state.error = null;
 
         if (state.currentPage === 1) {
+          // Replace videos on first page
           state.videos = action.payload.videos;
         } else {
+          // Append unique videos on next pages
           const newVideoIds = new Set(state.videos.map((v) => v._id));
           const filtered = action.payload.videos.filter(
             (v) => !newVideoIds.has(v._id)
@@ -60,7 +73,6 @@ const getvideo = createSlice({
         state.totalPages = action.payload.totalPages;
         state.currentPage = action.payload.currentPage;
       })
-
       .addCase(getvideoThunk.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload || "Failed to fetch videos";
@@ -68,6 +80,13 @@ const getvideo = createSlice({
   },
 });
 
-export const { setVideos, resetVideos, nextPage, prevPage, setPage } =
-  getvideo.actions;
+export const {
+  setVideos,
+  resetVideos,
+  nextPage,
+  prevPage,
+  setPage,
+  setCategory,
+} = getvideo.actions;
+
 export default getvideo.reducer;

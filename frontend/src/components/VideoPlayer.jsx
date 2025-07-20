@@ -16,12 +16,16 @@ const VideoPlayer = ({ video }) => {
   const [playing, setPlaying] = useState(false);
   const [showcomment, setShowComment] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
-const [isLiked, setIsLiked] = useState(false);
-const isLogin = localStorage.getItem('isLogin')
-const navigate = useNavigate()
+  const [isLiked, setIsLiked] = useState(false);
+  const [videoLoading, setVideoLoading] = useState(true);
+
+  const isLogin = localStorage.getItem("isLogin");
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const likedvideos = useSelector((state) => state.like?.likevideos ?? []);
+
   const toggleMute = () => setMuted((m) => !m);
+
   const handleTimeUpdate = () => {
     if (!videoRef.current) return;
     const { currentTime = 0, duration = 1 } = videoRef.current;
@@ -45,14 +49,14 @@ const navigate = useNavigate()
     }
   };
 
-  const handleLike = (id) =>{
-    if(!isLogin){
-      toast.info('first login your account.')
-      return
+  const handleLike = (id) => {
+    if (!isLogin) {
+      toast.info("first login your account.");
+      return;
     }
-    setIsLiked((prev)=>!prev)
-   dispatch(likeThunk(id));
-  }
+    setIsLiked((prev) => !prev);
+    dispatch(likeThunk(id));
+  };
 
   const refreshLikedVideos = async () => {
     try {
@@ -102,21 +106,17 @@ const navigate = useNavigate()
   }, []);
 
   useEffect(() => {
-    if(!isLogin){
-      return
+    if (!isLogin) {
+      return;
     }
     refreshLikedVideos();
   }, []);
 
   useEffect(() => {
-    console.log("likedvideos →", likedvideos);
-  }, [likedvideos]);
-
-   useEffect(() => {
     setIsLiked(likedvideos.includes(video._id));
   }, [likedvideos, video._id]);
-  const onClose = () => setShowComment(false);
 
+  const onClose = () => setShowComment(false);
   const shareUrl = `${window.location.origin}/getsinglevideo/${video._id}`;
 
   const handleCopyLink = async () => {
@@ -134,7 +134,14 @@ const navigate = useNavigate()
       className="w-full h-full flex items-center justify-center bg-black"
     >
       <div className="relative w-full h-full max-w-md mx-auto bg-black text-white overflow-hidden">
+        {/* Loading Spinner */}
+        {videoLoading && (
+          <div className="absolute inset-0 flex items-center justify-center z-20 bg-black/70">
+            <div className="w-12 h-12 border-4 border-pink-500 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        )}
 
+        {/* Video */}
         <video
           ref={videoRef}
           src={video.videourl}
@@ -144,17 +151,22 @@ const navigate = useNavigate()
           onClick={handlePlayPause}
           preload="metadata"
           crossOrigin="anonymous"
-          className="w-full h-full object-contain cursor-pointer"
+          onCanPlay={() => setVideoLoading(false)}
+          onLoadedData={() => setVideoLoading(false)}
+          className={`w-full h-full object-contain cursor-pointer ${
+            videoLoading ? "invisible" : "visible"
+          }`}
         />
 
+        {/* Mute Button */}
         <button
           onClick={toggleMute}
-          className="absolute lg:top-16 top-2 right-4 p-2 rounded-full bg-white/20 hover:bg-white/30 z-30"
+          className="absolute lg:top-16  top-14  right-4 p-2 rounded-full bg-white/20 hover:bg-white/30 z-30"
         >
           {muted ? <VolumeX size={20} /> : <Volume2 size={20} />}
         </button>
 
-        {/* Right-side buttons */}
+        {/* Right-side Buttons */}
         <div className="absolute bottom-44 right-4 flex flex-col items-center space-y-4 z-10">
           <button onClick={() => handleLike(video._id)} className="flex flex-col items-center">
             <Heart size={28} className={`transition ${isLiked ? "text-pink-500 fill-pink-500" : "text-white"}`} />
@@ -170,8 +182,8 @@ const navigate = useNavigate()
           </button>
         </div>
 
-        {/* Bottom user info */}
-        <div className="absolute bottom-32 lg:bottom-10 left-4 flex items-center space-x-3 z-10">
+        {/* Bottom User Info */}
+        <div className="absolute bottom-36 lg:bottom-10 left-4 flex items-center space-x-3 z-10">
           <img
             src={video.profilepic || "https://via.placeholder.com/40"}
             alt=""
@@ -183,12 +195,11 @@ const navigate = useNavigate()
           </div>
         </div>
 
-        {showcomment && (
-          <CommentSection videoId={video._id} onClose={onClose} />
-        )}
+        {/* Comment Section */}
+        {showcomment && <CommentSection videoId={video._id} onClose={onClose} />}
 
-        {/* Seek bar */}
-        <div className="absolute w-full px-4 bottom-24 lg:bottom-5 z-10">
+        {/* Seek Bar */}
+        <div className="absolute w-full px-4 bottom-28 lg:bottom-5 z-10">
           <input
             type="range"
             min="0"
@@ -201,62 +212,61 @@ const navigate = useNavigate()
 
         {/* Share Modal */}
         {showShareModal && (
-          
-
-           <div
+          <div
             className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center"
             onClick={() => setShowShareModal(false)}
           >
-       {
-        isLogin ?      <div
-              className="bg-white rounded-xl p-6 w-80 space-y-4 relative"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                className="absolute top-2 right-2 text-black text-lg"
-                onClick={() => setShowShareModal(false)}
+            {isLogin ? (
+              <div
+                className="bg-white rounded-xl p-6 w-80 space-y-4 relative"
+                onClick={(e) => e.stopPropagation()}
               >
-                ❌
-              </button>
-              <h2 className="text-lg font-semibold text-black text-center">
-                Share this video
-              </h2>
-
-              <button
-                onClick={handleCopyLink}
-                className="w-full bg-pink-500 text-white py-2 rounded-lg hover:bg-pink-600"
-              >
-                📋 Copy Link
-              </button>
-
-              <div className="flex justify-around mt-2">
-                <a
-                  href={`https://wa.me/?text=${encodeURIComponent(shareUrl)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  className="absolute top-2 right-2 text-black text-lg"
+                  onClick={() => setShowShareModal(false)}
                 >
-                  <img src="https://img.icons8.com/color/48/whatsapp--v1.png" alt="WhatsApp" className="w-10 h-10" />
-                </a>
-                <a
-                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  ❌
+                </button>
+                <h2 className="text-lg font-semibold text-black text-center">Share this video</h2>
+
+                <button
+                  onClick={handleCopyLink}
+                  className="w-full bg-pink-500 text-white py-2 rounded-lg hover:bg-pink-600"
                 >
-                  <img src="https://img.icons8.com/color/48/facebook-new.png" alt="Facebook" className="w-10 h-10" />
-                </a>
-              </div>
-            </div>:    <div
-              className="bg-white rounded-xl p-6 w-80  flex justify-center relative"
-              onClick={(e) => e.stopPropagation()}
-            ><button
-                    onClick={() => navigate('/loginsignup',{replace:true})}
-                    className="bg-pink-500  text-white font-semibold px-4 py-2 rounded hover:bg-gray-100 transition"
+                  📋 Copy Link
+                </button>
+
+                <div className="flex justify-around mt-2">
+                  <a
+                    href={`https://wa.me/?text=${encodeURIComponent(shareUrl)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
-                    Sign In
-                  </button>
-                  </div>
-       }
-          </div>   
+                    <img src="https://img.icons8.com/color/48/whatsapp--v1.png" alt="WhatsApp" className="w-10 h-10" />
+                  </a>
+                  <a
+                    href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <img src="https://img.icons8.com/color/48/facebook-new.png" alt="Facebook" className="w-10 h-10" />
+                  </a>
+                </div>
+              </div>
+            ) : (
+              <div
+                className="bg-white rounded-xl p-6 w-80 flex justify-center relative"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button
+                  onClick={() => navigate("/loginsignup", { replace: true })}
+                  className="bg-pink-500 text-white font-semibold px-4 py-2 rounded hover:bg-pink-600 transition"
+                >
+                  Sign In
+                </button>
+              </div>
+            )}
+          </div>
         )}
       </div>
     </div>

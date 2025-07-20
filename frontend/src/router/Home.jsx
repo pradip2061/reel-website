@@ -9,22 +9,24 @@ const Home = () => {
   const containerRef = useRef(null);
   const dispatch = useDispatch();
 
-  const { videos, currentPage, totalPages, status,limit } = useSelector(
+  const { videos, currentPage, totalPages, status, limit,category} = useSelector(
     (state) => state.getvideo
   );
   const [visibleIndex, setVisibleIndex] = useState(0);
-  const [category, setCategory] = useState("All");
 
   // Fetch videos when category or currentPage changes
   useEffect(() => {
-    dispatch(getvideoThunk({ category, page:currentPage,limit}));
-  }, [dispatch, category, currentPage]);
+    dispatch(getvideoThunk({ category, page: currentPage, limit }));
+  }, [dispatch, category, currentPage, limit]);
 
   const handleLoadMore = () => {
     if (currentPage < totalPages) {
       dispatch(nextPage());
     }
   };
+
+  // Debounce timer ref
+  const debounceTimer = useRef(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -38,7 +40,12 @@ const Home = () => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           const index = Number(entry.target.getAttribute("data-index"));
-          setVisibleIndex(index);
+
+          // Debounce setVisibleIndex to avoid flickering
+          if (debounceTimer.current) clearTimeout(debounceTimer.current);
+          debounceTimer.current = setTimeout(() => {
+            setVisibleIndex(index);
+          }, 100); // 100ms debounce delay
         }
       });
     }, options);
@@ -48,32 +55,41 @@ const Home = () => {
 
     return () => {
       elements.forEach((el) => observer.unobserve(el));
+      if (debounceTimer.current) clearTimeout(debounceTimer.current);
     };
   }, [videos.length]);
 
   // DEBUG: Show current state in console
   console.log({ currentPage, totalPages, videosLength: videos.length });
 
-  if (!videos) {
+  if (status === "loading") {
     return (
-      <div className="max-w-5xl mx-auto px-4 py-8 pt-20">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[...Array(6)].map((_, i) => (
-            <div
-              key={i}
-              className="bg-white rounded-xl overflow-hidden shadow animate-pulse"
-            >
-              <div className="bg-gray-300 h-72 w-full"></div>
-              <div className="p-4 space-y-3">
-                <div className="h-6 bg-gray-300 rounded w-3/4"></div>
-                <div className="flex justify-between">
-                  <div className="h-4 bg-gray-300 rounded w-1/4"></div>
-                  <div className="h-4 bg-gray-300 rounded w-1/6"></div>
-                  <div className="h-4 bg-gray-300 rounded w-1/5"></div>
-                </div>
+      <div className="w-[400px] h-[600px] mx-auto p-2 pt-20">
+        <div className="bg-white rounded-xl overflow-hidden shadow animate-pulse h-full w-full flex flex-col">
+          {/* Top Text */}
+          <div className="bg-gray-300 h-5 w-3/4 mx-auto mt-3 rounded"></div>
+
+          {/* Video Placeholder */}
+          <div className="bg-gray-300 flex-1 w-full mt-3"></div>
+
+          {/* Bottom Section */}
+          <div className="p-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {/* Profile */}
+              <div className="bg-gray-300 h-8 w-8 rounded-full"></div>
+              <div>
+                <div className="bg-gray-300 h-3 w-20 rounded mb-1"></div>
+                <div className="bg-gray-300 h-2 w-12 rounded"></div>
               </div>
             </div>
-          ))}
+
+            {/* Icons */}
+            <div className="flex flex-col gap-3 items-center">
+              <div className="bg-gray-300 h-5 w-5 rounded-full"></div>
+              <div className="bg-gray-300 h-5 w-5 rounded-full"></div>
+              <div className="bg-gray-300 h-5 w-5 rounded-full"></div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -93,7 +109,6 @@ const Home = () => {
         >
           <VideoCard video={video} active={index === visibleIndex} />
 
-          {/* Load More button: force display if you want */}
           {(index === videos.length - 1 && currentPage < totalPages) && (
             <div
               className="absolute bottom-40 left-1/2 transform -translate-x-1/2 z-50"

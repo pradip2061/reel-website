@@ -1,17 +1,37 @@
 // src/pages/FlashPage.jsx
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios'
+import { useState } from 'react';
 
 const FlashPage = () => {
   const navigate = useNavigate();
 
+  const [showFlash, setShowFlash] = useState(true);
+
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigate('/loginsignup',{replace:true}); // Change this to your actual homepage route
-    }, 3000); // 3 seconds
+      setShowFlash(false); // Hide flash after 3 seconds
+      checkToken();        // Then check token
+    }, 3000);
 
-    return () => clearTimeout(timer);
-  }, [navigate]);
+    return () => clearTimeout(timer); // cleanup
+  }, []);
+
+  const checkToken = async () => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/verifytoken`, {
+        withCredentials: true,
+      });
+
+      if (response.status === 200) {
+        navigate("/home", { replace: true });
+      }
+    } catch (error) {
+      localStorage.removeItem("isLogin");
+      navigate("/loginsignup", { replace: true });
+    }
+  };
 
   return (
     <div className="flex items-center justify-center h-screen w-screen bg-black text-white flex-col animate-fade-in">

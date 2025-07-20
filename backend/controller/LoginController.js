@@ -27,6 +27,7 @@ try {
   httpOnly: true,
     secure: true, // true in production
     sameSite: 'Strict',
+    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days in milliseconds
 });   
 
     res.status(200).json({message:'login successfully!',id:userinfo._id})
@@ -40,6 +41,7 @@ const logout =async(req,res)=>{
     httpOnly: true,
     secure: true, // true in production
     sameSite: 'Strict',
+    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days in milliseconds
   });
   res.status(200).json({ message: 'Logged out successfully' });
     } catch (error) {
