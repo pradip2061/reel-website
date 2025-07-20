@@ -25,7 +25,7 @@ try {
     console.log(token)
     res.cookie('token', token, {
   httpOnly: true,
-    secure: false, // true in production
+    secure: true, // true in production
     sameSite: 'None',
     maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days in milliseconds
 });   
@@ -39,7 +39,7 @@ const logout =async(req,res)=>{
     try {
         res.clearCookie('token', {
     httpOnly: true,
-    secure: false, // true in production
+    secure: true, // true in production
     sameSite: 'None',
     maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days in milliseconds
   });
