@@ -1,5 +1,5 @@
 const express =require('express')
-const { liked, comment, checkLikeOrNot, getComments, replyToComment, deleteCommentOrReply, getsinglevideo, getpersonalinfo } = require('../controller/FeedbackController')
+const { liked, comment, checkLikeOrNot, getComments, replyToComment, deleteCommentOrReply, getsinglevideo, getpersonalinfo, getotherpersonalinfo } = require('../controller/FeedbackController')
 const checkCookieAuth = require('../middleware/AuthCheck')
 
 const feedbackRouter = express.Router()
@@ -11,4 +11,5 @@ feedbackRouter.get('/islike',checkCookieAuth,checkLikeOrNot)
 feedbackRouter.get('/getcomment',getComments)
 feedbackRouter.get('/getsinglevideo/:id',getsinglevideo)
 feedbackRouter.get('/getpersonaldetail',checkCookieAuth,getpersonalinfo)
+feedbackRouter.get('/getotherpersonaldetail',getotherpersonalinfo)
 module.exports = feedbackRouter

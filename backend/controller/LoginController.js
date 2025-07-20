@@ -30,7 +30,7 @@ try {
     maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days in milliseconds
 });   
 
-    res.status(200).json({message:'login successfully!',id:userinfo._id})
+    res.status(200).json({message:'login successfully!',userid:userinfo._id})
 } catch (error) {
     console.log(error)
 }

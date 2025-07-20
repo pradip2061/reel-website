@@ -260,7 +260,7 @@ const getpersonalinfo = async (req, res) => {
     }
 
     // Get videos uploaded by this user
-    const videos = await video.find({Name:name}).select("videourl comments isliked category createdAt");
+    const videos = await video.find({userid:id}).select("videourl comments isliked category createdAt");
 
     return res.status(200).json({ userinfo, videos });
   } catch (error) {
@@ -269,4 +269,25 @@ const getpersonalinfo = async (req, res) => {
   }
 };
 
-module.exports= {liked,comment,replyToComment,getComments,checkLikeOrNot,deleteCommentOrReply,getsinglevideo,getpersonalinfo}
+const getotherpersonalinfo = async (req, res) => {
+  try {
+    const { id} = req.query;
+
+    // Get user info, exclude password
+    const userinfo = await Sign.findById(id).select("-password");
+
+    if (!userinfo) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Get videos uploaded by this user
+    const videos = await video.find({userid:id}).select("videourl comments isliked category createdAt");
+
+    return res.status(200).json({ userinfo, videos });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+module.exports= {liked,comment,replyToComment,getComments,checkLikeOrNot,deleteCommentOrReply,getsinglevideo,getpersonalinfo,getotherpersonalinfo}

@@ -5,13 +5,17 @@ name:'login',
 initialState:{
     error:"",
     status:null,
-    message:""
+    message:"",
+    userid:""
 },
 reducers:{
     resetdataLogin:(state)=>{
         state.error=""
           state.status=null
             state.message=""
+    },
+    setUserid:(state,action)=>{
+        state.userid= action.payload
     }
 },
 extraReducers:(builder)=>{
@@ -20,10 +24,10 @@ state.error="",
 state.status = 'pending',
 state.message = ""
 }).addCase(loginThunk.fulfilled,(state,action)=>{
-    localStorage.setItem('userid',action.payload.id)
 state.error="",
 state.status = 'success',
 state.message = action.payload.message
+state.userid=action.payload.userid
 localStorage.setItem('isLogin', 'true');
 }).addCase(loginThunk.rejected,(state,action)=>{
 state.error= action.payload,
@@ -34,5 +38,5 @@ localStorage.removeItem('isLogin');
 }
 })
 
-export const {resetdataLogin} = login.actions
+export const {resetdataLogin,setUserid} = login.actions
 export default login.reducer

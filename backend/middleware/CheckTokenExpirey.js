@@ -7,16 +7,12 @@ const verifyToken = (req, res) => {
     return res.status(401).json({ message: "Not logged in" });
   }
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    if (err) {
-      return res.status(403).json({ message: "Token expired or invalid" });
-    }
-
-    // ✅ Token is valid
-    res.status(200).json({ message: "Token is valid"});
-  });
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    res.status(200).json({ message: "Token is valid", userid: decoded.id });
+  } catch (err) {
+    res.status(403).json({ message: "Token expired or invalid" });
+  }
 };
 
-
-
-module.exports = verifyToken
+module.exports = verifyToken;

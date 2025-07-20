@@ -18,7 +18,7 @@ const VideoPlayer = ({ video }) => {
   const [showShareModal, setShowShareModal] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [videoLoading, setVideoLoading] = useState(true);
-
+const userid = useSelector((state)=>state.login.userid)
   const isLogin = localStorage.getItem("isLogin");
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -128,6 +128,15 @@ const VideoPlayer = ({ video }) => {
     }
   };
 
+  const handleprofile = ()=>{
+    if(userid === video.userid){
+      navigate('/userprofile')
+    }else{
+         navigate(`/visitprofile/${video?.userid}`)
+    }
+ 
+  }
+
   return (
     <div
       ref={containerRef}
@@ -188,6 +197,7 @@ const VideoPlayer = ({ video }) => {
             src={video.profilepic || "https://via.placeholder.com/40"}
             alt=""
             className="w-10 h-10 rounded-full border-2 border-white"
+            onClick={handleprofile}
           />
           <div>
             <h3 className="font-bold text-pink-500">{video.Name || "Unknown"}</h3>

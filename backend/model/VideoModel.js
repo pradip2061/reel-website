@@ -4,6 +4,9 @@ const schema = new mongoose.Schema({
   Name: {
     type: String,
   },
+  userid:{
+    type:String
+  },
   category: {
     type: String,
   },

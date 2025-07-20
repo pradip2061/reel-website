@@ -22,7 +22,6 @@ state.error="",
 state.status = 'pending',
 state.message = ""
 }).addCase(logoutThunk.fulfilled,(state,action)=>{
-    localStorage.removeItem('userid')
      localStorage.removeItem('isLogin')
 state.error="",
 state.status = 'success',

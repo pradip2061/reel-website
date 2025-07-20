@@ -8,7 +8,7 @@ const videocreate = async (req, res) => {
       Title
     } = req.body;
 
-   const {name,profilepic}=req.user
+   const {name,profilepic,id}=req.user
     if (!req.file || req.file.length === 0) {
       return res.status(400).json({ message: "Image upload failed!" });
     }
@@ -22,6 +22,7 @@ const formattedDate = today.toLocaleDateString('en-US', {
     // Create and save the new path
     const newPath = new video({
         Name:name,
+        userid:id,
   category,
   profilepic,
     date:formattedDate,
@@ -72,6 +73,22 @@ const getvideo = async (req, res) => {
   }
 };
 
+const deletevideo = async (req, res) => {
+  const { videoid } = req.query;
+
+  try {
+    const deletedVideo = await video.findByIdAndDelete(videoid);
+
+    if (!deletedVideo) {
+      return res.status(404).json({ message: 'Video not found' });
+    }
+
+    res.status(200).json({ message: 'Video deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting video:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+}
 
 
-module.exports = {videocreate,getvideo};
+module.exports = {videocreate,getvideo,deletevideo};
