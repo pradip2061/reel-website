@@ -14,7 +14,6 @@ reducers:{
         state.error=""
           state.status=null
             state.message=""
-            localStorage.removeItem('isLogin')
     }
 },
 extraReducers:(builder)=>{
@@ -24,6 +23,7 @@ state.status = 'pending',
 state.message = ""
 }).addCase(logoutThunk.fulfilled,(state,action)=>{
     localStorage.removeItem('userid')
+     localStorage.removeItem('isLogin')
 state.error="",
 state.status = 'success',
 state.message = action.payload

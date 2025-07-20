@@ -25,8 +25,8 @@ try {
     console.log(token)
     res.cookie('token', token, {
   httpOnly: true,
-    secure: true, // true in production
-    sameSite: 'Strict',
+    secure: false, // true in production
+    sameSite: 'None',
     maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days in milliseconds
 });   
 
@@ -39,8 +39,8 @@ const logout =async(req,res)=>{
     try {
         res.clearCookie('token', {
     httpOnly: true,
-    secure: true, // true in production
-    sameSite: 'Strict',
+    secure: false, // true in production
+    sameSite: 'None',
     maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days in milliseconds
   });
   res.status(200).json({ message: 'Logged out successfully' });

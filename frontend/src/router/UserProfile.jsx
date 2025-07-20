@@ -91,7 +91,7 @@ const totalComments = video.reduce((sum, v) => sum + (v.comments?.length || 0), 
 }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 lg:pt-20">
+    <div className="max-w-5xl mx-auto px-4 py-8  pt-20">
       <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden">
 
         <button
