@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setCategory } from "../../store/getvideo/getvideoSlice"; // import the new action
 
 const categories = [
-  { label: "All", icon: <Home size={18} />, key: "all" },
+  { label: "All", icon: <Home size={18} />, key: "All" },
   { label: "funny", icon: <Smile size={18} />, key: "funny" },
   { label: "education", icon: <Book size={18} />, key: "education" },
   { label: "sad", icon: <Frown size={18} />, key: "sad" },
