@@ -60,7 +60,7 @@ const Home = () => {
   }, [videos.length]);
 
   // DEBUG: Show current state in console
-  console.log({ currentPage, totalPages, videosLength: videos.length });
+  console.log({ currentPage, totalPages, videosLength: videos?.length });
 
   if (status === "loading") {
     return (
@@ -100,7 +100,7 @@ const Home = () => {
       ref={containerRef}
       className="h-screen overflow-y-scroll snap-y snap-mandatory relative"
     >
-      {videos.map((video, index) => (
+      {videos?.map((video, index) => (
         <div
           key={video._id}
           className="video-slide snap-start snap-always relative"
@@ -109,7 +109,7 @@ const Home = () => {
         >
           <VideoCard video={video} active={index === visibleIndex} />
 
-          {(index === videos.length - 1 && currentPage < totalPages) && (
+          {(index === videos?.length - 1 && currentPage < totalPages) && (
             <div
               className="absolute bottom-40 left-1/2 transform -translate-x-1/2 z-50"
             >

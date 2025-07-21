@@ -32,7 +32,7 @@ useEffect(() => {
         withCredentials: true, 
       });
       if (response.status === 200) {
-        dispatch(setUserid(response.data.userid));
+        dispatch(setUserid(response.data));
       }
     } catch (error) {
       console.error("User verification failed:", error?.response?.data?.message || error.message);

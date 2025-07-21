@@ -7,6 +7,7 @@ import { setdataLike } from "../../store/like/LikeSlice";
 import { useNavigate } from "react-router-dom";
 import CommentSection from "./CommentSection";
 import { toast } from "react-toastify";
+import { addFollowing, removeFollowing } from "../../store/login/LoginSlice";
 
 const VideoPlayer = ({ video }) => {
   const videoRef = useRef(null);
@@ -18,12 +19,12 @@ const VideoPlayer = ({ video }) => {
   const [showShareModal, setShowShareModal] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [videoLoading, setVideoLoading] = useState(true);
-const userid = useSelector((state)=>state.login.userid)
+  const { userid, following } = useSelector((state) => state.login);
   const isLogin = localStorage.getItem("isLogin");
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const likedvideos = useSelector((state) => state.like?.likevideos ?? []);
-
+  const [follow, setFollow] = useState(false);
   const toggleMute = () => setMuted((m) => !m);
 
   const handleTimeUpdate = () => {
@@ -42,7 +43,10 @@ const userid = useSelector((state)=>state.login.userid)
   const handlePlayPause = () => {
     if (!videoRef.current) return;
     if (videoRef.current.paused) {
-      videoRef.current.play().then(() => setPlaying(true)).catch(() => {});
+      videoRef.current
+        .play()
+        .then(() => setPlaying(true))
+        .catch(() => {});
     } else {
       videoRef.current.pause();
       setPlaying(false);
@@ -71,9 +75,6 @@ const userid = useSelector((state)=>state.login.userid)
         if (JSON.stringify(localSorted) !== JSON.stringify(serverSorted)) {
           dispatch(setdataLike(serverLikes));
         }
-        if (!localStorage.getItem("userid")) {
-          localStorage.setItem("userid", data.id);
-        }
       }
     } catch (err) {
       console.error("Fetch like error:", err?.response?.data?.message ?? err);
@@ -85,7 +86,10 @@ const userid = useSelector((state)=>state.login.userid)
       ([entry]) => {
         if (!videoRef.current) return;
         if (entry.isIntersecting) {
-          videoRef.current.play().then(() => setPlaying(true)).catch(() => {});
+          videoRef.current
+            .play()
+            .then(() => setPlaying(true))
+            .catch(() => {});
         } else {
           videoRef.current.pause();
           setPlaying(false);
@@ -128,14 +132,41 @@ const userid = useSelector((state)=>state.login.userid)
     }
   };
 
-  const handleprofile = ()=>{
-    if(userid === video.userid){
-      navigate('/userprofile')
-    }else{
-         navigate(`/visitprofile/${video?.userid}`)
+  const handleprofile = () => {
+    if (userid === video.userid) {
+      navigate("/userprofile");
+    } else {
+      navigate(`/visitprofile/${video?.userid}`);
     }
- 
-  }
+  };
+
+  const isFollowing = following.includes(video.userid);
+
+  const handlefollowandfollowing = async (userid) => {
+    if (!isLogin) {
+      toast.info("Please login to follow or unfollow.");
+      return;
+    }
+    if (isFollowing) {
+      dispatch(removeFollowing(userid));
+    } else {
+      dispatch(addFollowing(userid));
+    }
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/handlefollowandfollowing`,
+        { userid },
+        { withCredentials: true }
+      );
+      console.log(response);
+    } catch (err) {
+      console.error(
+        "Follow/unfollow error:",
+        err?.response?.data?.message ?? err
+      );
+      toast.error("Something went wrong. Try again.");
+    }
+  };
 
   return (
     <div
@@ -177,15 +208,29 @@ const userid = useSelector((state)=>state.login.userid)
 
         {/* Right-side Buttons */}
         <div className="absolute bottom-44 right-4 flex flex-col items-center space-y-4 z-10">
-          <button onClick={() => handleLike(video._id)} className="flex flex-col items-center">
-            <Heart size={28} className={`transition ${isLiked ? "text-pink-500 fill-pink-500" : "text-white"}`} />
+          <button
+            onClick={() => handleLike(video._id)}
+            className="flex flex-col items-center"
+          >
+            <Heart
+              size={28}
+              className={`transition ${
+                isLiked ? "text-pink-500 fill-pink-500" : "text-white"
+              }`}
+            />
             <span className="text-xs">Like</span>
           </button>
-          <button onClick={() => setShowComment((prev) => !prev)} className="flex flex-col items-center">
+          <button
+            onClick={() => setShowComment((prev) => !prev)}
+            className="flex flex-col items-center"
+          >
             <MessageCircle size={28} />
             <span className="text-xs">Comment</span>
           </button>
-          <button onClick={() => setShowShareModal(true)} className="flex flex-col items-center">
+          <button
+            onClick={() => setShowShareModal(true)}
+            className="flex flex-col items-center"
+          >
             <Share2 size={28} />
             <span className="text-xs">Share</span>
           </button>
@@ -196,18 +241,32 @@ const userid = useSelector((state)=>state.login.userid)
           <img
             src={video.profilepic || "https://via.placeholder.com/40"}
             alt=""
-            className="w-10 h-10 rounded-full border-2 border-white"
+            className="w-10 h-10 rounded-full border-2 border-white cursor-pointer"
             onClick={handleprofile}
           />
-          <div>
-            <h3 className="font-bold text-pink-500">{video.Name || "Unknown"}</h3>
+          <div className="flex flex-col">
+            <h3 className="font-bold text-pink-500">
+              {video.Name || "Unknown"}
+            </h3>
             <p className="text-sm">{video.Title || "No Title"}</p>
           </div>
+          {userid !== video.userid && (
+            <button
+              onClick={() => handlefollowandfollowing(video.userid)}
+              className={`ml-4 px-4 py-1  mb-4 rounded-full text-sm font-semibold transition ${
+                isFollowing
+                  ? "bg-white text-black border border-gray-300 hover:bg-gray-200"
+                  : "bg-pink-500 text-white hover:bg-pink-600"
+              }`}
+            >
+              {isFollowing ? "Following" : "Follow"}
+            </button>
+          )}
         </div>
-
         {/* Comment Section */}
-        {showcomment && <CommentSection videoId={video._id} onClose={onClose} />}
-
+        {showcomment && (
+          <CommentSection videoId={video._id} onClose={onClose} />
+        )}
         {/* Seek Bar */}
         <div className="absolute w-full px-4 bottom-28 lg:bottom-5 z-10">
           <input
@@ -237,7 +296,9 @@ const userid = useSelector((state)=>state.login.userid)
                 >
                   ❌
                 </button>
-                <h2 className="text-lg font-semibold text-black text-center">Share this video</h2>
+                <h2 className="text-lg font-semibold text-black text-center">
+                  Share this video
+                </h2>
 
                 <button
                   onClick={handleCopyLink}
@@ -252,14 +313,24 @@ const userid = useSelector((state)=>state.login.userid)
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    <img src="https://img.icons8.com/color/48/whatsapp--v1.png" alt="WhatsApp" className="w-10 h-10" />
+                    <img
+                      src="https://img.icons8.com/color/48/whatsapp--v1.png"
+                      alt="WhatsApp"
+                      className="w-10 h-10"
+                    />
                   </a>
                   <a
-                    href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`}
+                    href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+                      shareUrl
+                    )}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    <img src="https://img.icons8.com/color/48/facebook-new.png" alt="Facebook" className="w-10 h-10" />
+                    <img
+                      src="https://img.icons8.com/color/48/facebook-new.png"
+                      alt="Facebook"
+                      className="w-10 h-10"
+                    />
                   </a>
                 </div>
               </div>

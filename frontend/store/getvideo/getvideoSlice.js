@@ -63,8 +63,8 @@ const getvideo = createSlice({
           state.videos = action.payload.videos;
         } else {
           // Append unique videos on next pages
-          const newVideoIds = new Set(state.videos.map((v) => v._id));
-          const filtered = action.payload.videos.filter(
+          const newVideoIds = new Set(state.videos?.map((v) => v._id));
+          const filtered = action.payload.videos?.filter(
             (v) => !newVideoIds.has(v._id)
           );
           state.videos = [...state.videos, ...filtered];

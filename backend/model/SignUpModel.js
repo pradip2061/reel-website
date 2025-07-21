@@ -20,7 +20,9 @@ Name:{
   profilepic:{
     type:String
   },
-  likedvideos:[String]
+  likedvideos:[String],
+  followers:[String],
+  following:[String]
 }, { timestamps: true });
 
 const Sign = mongoose.model('Sign', schema);

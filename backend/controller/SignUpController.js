@@ -45,6 +45,8 @@ const signup = async (req, res) => {
       password: hashedPassword,
       profilepic: req.file.path,
       Name: firstName + lastName,
+      following:[],
+      followers:[]
     });
 
     res.status(200).json({ message: "signup successfully!" });

@@ -98,11 +98,11 @@ const totalComments = video.reduce((sum, v) => sum + (v.comments?.length || 0), 
               <div className="mt-4 flex flex-wrap justify-center sm:justify-start gap-4 text-sm">
                 <div className="flex items-center gap-2">
                   <Users size={16} />
-                  <span>{info?.followers?.toLocaleString() || 0} followers</span>
+                  <span>{info?.followers.length?.toLocaleString() || 0} followers</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <UserPlus size={16} />
-                  <span>{info?.following?.toLocaleString() || 0} following</span>
+                  <span>{info?.following.length?.toLocaleString() || 0} following</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar size={16} />

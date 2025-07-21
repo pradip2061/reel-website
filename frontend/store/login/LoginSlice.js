@@ -6,7 +6,8 @@ initialState:{
     error:"",
     status:null,
     message:"",
-    userid:""
+    userid:"",
+    following:[]
 },
 reducers:{
     resetdataLogin:(state)=>{
@@ -15,8 +16,15 @@ reducers:{
             state.message=""
     },
     setUserid:(state,action)=>{
-        state.userid= action.payload
-    }
+        state.userid= action.payload.userid,
+        state.following=action.payload.following
+    },
+      addFollowing: (state, action) => {
+    state.following.push(action.payload); // payload = userid
+  },
+  removeFollowing: (state, action) => {
+    state.following = state.following.filter((id) => id !== action.payload);
+  },
 },
 extraReducers:(builder)=>{
 builder.addCase(loginThunk.pending,(state,action)=>{
@@ -28,6 +36,7 @@ state.error="",
 state.status = 'success',
 state.message = action.payload.message
 state.userid=action.payload.userid
+state.following=action.payload.following
 localStorage.setItem('isLogin', 'true');
 }).addCase(loginThunk.rejected,(state,action)=>{
 state.error= action.payload,
@@ -38,5 +47,5 @@ localStorage.removeItem('isLogin');
 }
 })
 
-export const {resetdataLogin,setUserid} = login.actions
+export const {resetdataLogin,setUserid,addFollowing,removeFollowing} = login.actions
 export default login.reducer

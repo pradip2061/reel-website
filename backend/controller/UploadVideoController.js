@@ -29,7 +29,7 @@ const formattedDate = today.toLocaleDateString('en-US', {
   Title,
   comments:[],
   isliked:[],
-  videourl:req.file.path
+  videourl:req.file.path,
     });
 
     await newPath.save();

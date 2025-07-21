@@ -290,4 +290,44 @@ const getotherpersonalinfo = async (req, res) => {
   }
 };
 
-module.exports= {liked,comment,replyToComment,getComments,checkLikeOrNot,deleteCommentOrReply,getsinglevideo,getpersonalinfo,getotherpersonalinfo}
+const handlefollowerAndfollowing = async (req, res) => {
+  try {
+    const { userid } = req.body;
+    const { id } = req.user;
+    if (userid === id) {
+      return res.status(400).json({ message: "You cannot follow yourself." });
+    }
+
+    const otheruserinfo = await Sign.findById(userid);
+    const ownuserinfo = await Sign.findById(id);
+
+    if (!otheruserinfo || !ownuserinfo) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    const isFollowing = otheruserinfo.followers.includes(id);
+
+    if (isFollowing) {
+      // 🔁 Unfollow logic
+      otheruserinfo.followers = otheruserinfo.followers.filter(followerId => followerId !== id);
+      ownuserinfo.following = ownuserinfo.following.filter(followingId => followingId !== userid);
+    } else {
+      // ✅ Follow logic
+      otheruserinfo.followers.push(id);
+      ownuserinfo.following.push(userid);
+    }
+
+    await otheruserinfo.save();
+    await ownuserinfo.save();
+
+    res.status(200).json({ 
+      message: isFollowing ? "Unfollowed successfully" : "Followed successfully" 
+    });
+  } catch (err) {
+    console.error("Follow error:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+module.exports= {liked,comment,replyToComment,getComments,checkLikeOrNot,deleteCommentOrReply,getsinglevideo,getpersonalinfo,getotherpersonalinfo,handlefollowerAndfollowing}
