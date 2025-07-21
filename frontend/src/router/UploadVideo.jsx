@@ -13,7 +13,7 @@ const UploadVideo = () => {
 const isLogin = localStorage.getItem('isLogin')
   const categories = [
     { label: 'funny', emoji: '😄' },
-    { label: 'education', emoji: '📚' },
+    { label: 'study', emoji: '📚' },
     { label: 'sad', emoji: '😢' },
      { label: 'love', emoji: '❤️' }
   ];
