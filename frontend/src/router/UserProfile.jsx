@@ -120,11 +120,11 @@ const UserProfile = () => {
               alt={info?.Name}
               className="w-24 h-24 rounded-full border-4 border-white shadow-md bg-white"
             />
-          {
-            isLogin &&   <div className="flex-1 text-center sm:text-left">
+            <div className="flex-1 text-center sm:text-left">
               <h1 className="text-3xl font-bold">{info?.Name}</h1>
               <p className="text-pink-100 mt-1">{info?.email}</p>
-              <div className="mt-4 flex flex-wrap justify-center sm:justify-start gap-4 text-sm">
+          {
+            isLogin &&     <div className="mt-4 flex flex-wrap justify-center sm:justify-start gap-4 text-sm">
                 <div className="flex items-center gap-2">
                   <Users size={16} />
                   <span>{info?.followers?.toLocaleString() || 0} followers</span>
@@ -138,6 +138,7 @@ const UserProfile = () => {
                   <span>Joined {formatDate(info?.createdAt)}</span>
                 </div>
               </div>
+          }
              {
               isLogin ?  <div className="mt-4">
                 <button
@@ -156,7 +157,6 @@ const UserProfile = () => {
               </div>
              }
             </div>
-          }
           </div>
         </div>
 
