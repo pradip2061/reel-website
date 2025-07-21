@@ -329,5 +329,33 @@ const handlefollowerAndfollowing = async (req, res) => {
   }
 };
 
+const getpersonfollow = async (req, res) => {
+  try {
+    const { userid } = req.body; // userid here is an array of user IDs
+    console.log(userid)
+    if (!Array.isArray(userid)) {
+      return res.status(400).json({ message: "userid must be an array" });
+    }
+    
+    // Fetch users with only needed fields: _id, Name, profilepic
+    const users = await Sign.find(
+      { _id: { $in: userid } },
+      { Name: 1, profilepic: 1 } // projection: include only Name and profilepic, _id is included by default
+    );
 
-module.exports= {liked,comment,replyToComment,getComments,checkLikeOrNot,deleteCommentOrReply,getsinglevideo,getpersonalinfo,getotherpersonalinfo,handlefollowerAndfollowing}
+    // Format the response to include userid as string (if you want)
+    const result = users.map(user => ({
+      userid: user._id.toString(),
+      Name: user.Name,
+      profilepic: user.profilepic
+    }));
+
+    return res.status(200).json({ users: result });
+  } catch (error) {
+    console.error('getpersonfollow error:', error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
+
+
+module.exports= {liked,comment,replyToComment,getComments,checkLikeOrNot,deleteCommentOrReply,getsinglevideo,getpersonalinfo,getotherpersonalinfo,handlefollowerAndfollowing,getpersonfollow}

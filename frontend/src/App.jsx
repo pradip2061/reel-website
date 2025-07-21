@@ -7,6 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useEffect } from "react";
 import { setUserid } from "../store/login/LoginSlice";
 import axios from "axios";
+import GetuserDetail from "./router/GetuserDetail";
 
 
 // Lazy load pages
@@ -66,6 +67,7 @@ useEffect(() => {
           <Route path="/loginsignup" element={<LoginSignup />} />
           <Route path="/comment" element={<CommentSection />} />
           <Route path="/getsinglevideo/:id" element={<SingleVideoPage />} />
+              <Route path="/getuser" element={<GetuserDetail />} />
         </Routes>
       </Suspense>
     </>
