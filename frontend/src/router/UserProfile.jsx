@@ -120,7 +120,8 @@ const UserProfile = () => {
               alt={info?.Name}
               className="w-24 h-24 rounded-full border-4 border-white shadow-md bg-white"
             />
-            <div className="flex-1 text-center sm:text-left">
+          {
+            isLogin &&   <div className="flex-1 text-center sm:text-left">
               <h1 className="text-3xl font-bold">{info?.Name}</h1>
               <p className="text-pink-100 mt-1">{info?.email}</p>
               <div className="mt-4 flex flex-wrap justify-center sm:justify-start gap-4 text-sm">
@@ -137,19 +138,30 @@ const UserProfile = () => {
                   <span>Joined {formatDate(info?.createdAt)}</span>
                 </div>
               </div>
-              <div className="mt-4">
+             {
+              isLogin ?  <div className="mt-4">
                 <button
                   onClick={logout}
                   className="bg-white text-pink-600 font-semibold px-4 py-2 rounded hover:bg-gray-100 transition"
                 >
                   Logout
                 </button>
+              </div> :  <div className="mt-4">
+                <button
+                  onClick={()=>navigate('/loginsignup')}
+                  className="bg-white text-pink-600 font-semibold px-4 py-2 rounded hover:bg-gray-100 transition"
+                >
+                  Sign in
+                </button>
               </div>
+             }
             </div>
+          }
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 text-center border-t border-b p-6">
+    {
+      isLogin &&     <div className="grid grid-cols-1 sm:grid-cols-3 text-center border-t border-b p-6">
           <div>
             <p className="text-xl font-bold text-black">{video?.length}</p>
             <p className="text-gray-600">Videos</p>
@@ -163,6 +175,7 @@ const UserProfile = () => {
             <p className="text-gray-600">Total Comments</p>
           </div>
         </div>
+    }
 
         <div className="p-6">
           <h2 className="text-xl font-semibold text-black mb-4">Your Videos</h2>
