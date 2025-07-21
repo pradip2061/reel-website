@@ -1,5 +1,5 @@
 import React from "react";
-import { Home, Upload, User, Smile, Book, Frown } from "lucide-react";
+import { Home, Upload, User, Smile, Book, Frown,Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setCategory } from "../../store/getvideo/getvideoSlice"; // import the new action
@@ -7,8 +7,9 @@ import { setCategory } from "../../store/getvideo/getvideoSlice"; // import the 
 const categories = [
   { label: "All", icon: <Home size={18} />, key: "All" },
   { label: "funny", icon: <Smile size={18} />, key: "funny" },
-  { label: "education", icon: <Book size={18} />, key: "education" },
+  { label: "study", icon: <Book size={18} />, key: "study" },
   { label: "sad", icon: <Frown size={18} />, key: "sad" },
+  { label: "love", icon: <Heart size={18} />, key: "love" },
 ];
 
 const Nav = () => {

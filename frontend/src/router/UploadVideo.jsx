@@ -14,7 +14,8 @@ const isLogin = localStorage.getItem('isLogin')
   const categories = [
     { label: 'funny', emoji: '😄' },
     { label: 'education', emoji: '📚' },
-    { label: 'sad', emoji: '😢' }
+    { label: 'sad', emoji: '😢' },
+     { label: 'love', emoji: '❤️' }
   ];
 
   const handleVideoChange = (e) => {
