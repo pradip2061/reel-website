@@ -7,15 +7,8 @@ import { useState } from 'react';
 const FlashPage = () => {
   const navigate = useNavigate();
 
-  const [showFlash, setShowFlash] = useState(true);
-
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowFlash(false); // Hide flash after 3 seconds
-      checkToken();        // Then check token
-    }, 3000);
-
-    return () => clearTimeout(timer); // cleanup
+      checkToken();        
   }, []);
 
   const checkToken = async () => {
