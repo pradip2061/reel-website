@@ -10,7 +10,7 @@ const getvideo = createSlice({
     videos: [],
     currentPage: 1,
     totalPages: 0,
-    limit: 4,
+    limit: 16,
     category: "All",  // add default category here, lowercase recommended
   },
   reducers: {

@@ -57,10 +57,10 @@ const getvideo = async (req, res) => {
 
     if (category === "All") {
       totalVideos = await video.countDocuments();
-      videos = await video.find().skip(skip).limit(limitNumber);
+      videos = await video.find().sort({createdAt:-1}).skip(skip).limit(limitNumber);
     } else {
       totalVideos = await video.countDocuments({ category });
-      videos = await video.find({ category }).skip(skip).limit(limitNumber);
+      videos = await video.find({ category }).sort({createdAt:-1}).skip(skip).limit(limitNumber);
     }
     return res.status(200).json({
       videos,
