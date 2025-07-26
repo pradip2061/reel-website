@@ -12,7 +12,7 @@ connectToDatabase();
 app.use(cookieParser());
 
 app.use(cors({
-    origin: "https://reel-website-6bav.vercel.app",
+    origin:"https://reel-website-6bav.vercel.app",
   credentials: true
 }));
 
