@@ -44,34 +44,51 @@ const formattedDate = today.toLocaleDateString('en-US', {
 
 const getvideo = async (req, res) => {
   try {
-    const { category, page , limit} = req.query;
+    const { category, page, limit } = req.query;
+
     if (!category) {
       return res.status(400).json({ message: "Category is missing!" });
     }
 
-    const pageNumber = parseInt(page);
-    const limitNumber = parseInt(limit);
+    const pageNumber = parseInt(page) || 1;
+    const limitNumber = parseInt(limit) || 10;
+
+    if (pageNumber < 1 || limitNumber < 1) {
+      return res.status(400).json({ message: "Invalid pagination values" });
+    }
+
     const skip = (pageNumber - 1) * limitNumber;
 
     let videos, totalVideos;
 
     if (category === "All") {
       totalVideos = await video.countDocuments();
-      videos = await video.find().sort({createdAt:-1}).skip(skip).limit(limitNumber);
+      videos = await video.find()
+        .sort({ createdAt: -1 }) // newest first
+        .skip(skip)
+        .limit(limitNumber);
     } else {
       totalVideos = await video.countDocuments({ category });
-      videos = await video.find({ category }).sort({createdAt:-1}).skip(skip).limit(limitNumber);
+      videos = await video.find({ category })
+        .sort({ createdAt: -1 }) // newest first
+        .skip(skip)
+        .limit(limitNumber);
     }
+
     return res.status(200).json({
       videos,
+      totalVideos,
       totalPages: Math.ceil(totalVideos / limitNumber),
       currentPage: pageNumber,
+      limit: limitNumber
     });
+
   } catch (error) {
     console.error("Error fetching videos:", error);
     return res.status(500).json({ message: "Server error" });
   }
 };
+
 
 const deletevideo = async (req, res) => {
   const { videoid } = req.query;
