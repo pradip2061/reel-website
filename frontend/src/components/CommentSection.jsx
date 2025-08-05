@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Send, Reply, X } from "lucide-react";
+import { Send, Reply, X,Loader2 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { commentThunk } from "../../store/comment/commentThunk";
 import { RefreshComment, setComment } from "../../store/comment/commentSlice";
@@ -13,6 +13,7 @@ const CommentSection = ({ onClose, videoId }) => {
   const [reply, setReply] = useState({});
   const [expandedReplies, setExpandedReplies] = useState({});
   const[loading,setLoading]=useState(false)
+    const[loadingComment,setLoadingComment]=useState(false)
   const[replyLoading,setReplyLoading]=useState(false)
   const userid = useSelector((state)=>state.login.userid)
   const isLogin = localStorage.getItem("isLogin") === "true";
@@ -39,6 +40,7 @@ const CommentSection = ({ onClose, videoId }) => {
         if (!isLogin) {
       return;
     }
+    setLoadingComment(true)
       const res = await axios.get(
         `${import.meta.env.VITE_BASE_URL}/getcomment?videoid=${videoId}`,
         { withCredentials: true }
@@ -48,6 +50,8 @@ const CommentSection = ({ onClose, videoId }) => {
       }
     } catch (err) {
       console.error("Fetch comments error:", err?.response?.data?.message || err);
+    }finally{
+      setLoadingComment(false)
     }
   };
 
@@ -111,6 +115,11 @@ const CommentSection = ({ onClose, videoId }) => {
          navigate(`/visitprofile/${comment?.userid}`)
     }
  
+  }
+  if(loadingComment){
+    return<div>
+      <Loader2 size={32} color="black"/>
+    </div>
   }
 
    const handlereplyprofile = (id)=>{
