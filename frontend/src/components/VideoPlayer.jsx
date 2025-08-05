@@ -21,9 +21,9 @@ const VideoPlayer = ({ video }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [videoLoading, setVideoLoading] = useState(true);
 
-  // ✅ NEW STATES
-  const [likeCount, setLikeCount] = useState(video.likesCount || 0);
-  const [commentCount, setCommentCount] = useState(video.commentsCount || 0);
+  // ✅ Initialize counts from arrays
+  const [likeCount, setLikeCount] = useState(video.isLiked?.length || 0);
+  const [commentCount, setCommentCount] = useState(video.comments?.length || 0);
 
   const { userid, following } = useSelector((state) => state.login);
   const likedVideos = useSelector((state) => state.like?.likevideos ?? []);
@@ -57,7 +57,7 @@ const VideoPlayer = ({ video }) => {
     }
   };
 
-  // ✅ Updated handleLike
+  // ✅ Like Button Handler
   const handleLike = (id) => {
     if (!isLogin) {
       toast.info("Please login to like videos.");
@@ -71,24 +71,10 @@ const VideoPlayer = ({ video }) => {
     dispatch(likeThunk(id));
   };
 
-  const refreshLikedVideos = async () => {
-    try {
-      const { data, status } = await axios.get(
-        `${import.meta.env.VITE_BASE_URL}/islike`,
-        { withCredentials: true }
-      );
-      if (status === 200) {
-        const serverLikes = data.likedvideos?.likedvideos ?? [];
-        const localSorted = [...likedVideos].sort();
-        const serverSorted = [...serverLikes].sort();
-        if (JSON.stringify(localSorted) !== JSON.stringify(serverSorted)) {
-          dispatch(setdataLike(serverLikes));
-        }
-      }
-    } catch (err) {
-      console.error("Fetch like error:", err?.response?.data?.message ?? err);
-    }
-  };
+  // ✅ Update from Redux if needed
+  useEffect(() => {
+    setIsLiked(likedVideos.includes(video._id));
+  }, [likedVideos, video._id]);
 
   useEffect(() => {
     const obs = new IntersectionObserver(
@@ -114,15 +100,6 @@ const VideoPlayer = ({ video }) => {
     vid.addEventListener("timeupdate", handleTimeUpdate);
     return () => vid.removeEventListener("timeupdate", handleTimeUpdate);
   }, []);
-
-  useEffect(() => {
-    if (!isLogin) return;
-    refreshLikedVideos();
-  }, []);
-
-  useEffect(() => {
-    setIsLiked(likedVideos.includes(video._id));
-  }, [likedVideos, video._id]);
 
   const onClose = () => setShowComment(false);
   const shareUrl = `${window.location.origin}/getsinglevideo/${video._id}`;
@@ -248,7 +225,7 @@ const VideoPlayer = ({ video }) => {
           <CommentSection
             videoId={video._id}
             onClose={onClose}
-            onNewComment={() => setCommentCount((prev) => prev + 1)} // ✅ Increment on new comment
+            onNewComment={() => setCommentCount((prev) => prev + 1)} // ✅ Increment dynamically
           />
         )}
 
@@ -263,59 +240,6 @@ const VideoPlayer = ({ video }) => {
             className="w-full h-1 rounded-full bg-white/20 accent-pink-500"
           />
         </div>
-
-        {/* Share Modal */}
-        {showShareModal && (
-          <div
-            className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center"
-            onClick={() => setShowShareModal(false)}
-          >
-            {isLogin ? (
-              <div className="bg-white rounded-xl p-6 w-80 space-y-4 relative" onClick={(e) => e.stopPropagation()}>
-                <button className="absolute top-2 right-2 text-black text-lg" onClick={() => setShowShareModal(false)}>
-                  ❌
-                </button>
-                <h2 className="text-lg font-semibold text-black text-center">Share this video</h2>
-
-                <button
-                  onClick={handleCopyLink}
-                  className="w-full bg-pink-500 text-white py-2 rounded-lg hover:bg-pink-600"
-                >
-                  📋 Copy Link
-                </button>
-
-                <div className="flex justify-around mt-2">
-                  <a
-                    href={`https://wa.me/?text=${encodeURIComponent(shareUrl)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <img src="https://img.icons8.com/color/48/whatsapp--v1.png" alt="WhatsApp" className="w-10 h-10" />
-                  </a>
-                  <a
-                    href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <img src="https://img.icons8.com/color/48/facebook-new.png" alt="Facebook" className="w-10 h-10" />
-                  </a>
-                </div>
-              </div>
-            ) : (
-              <div
-                className="bg-white rounded-xl p-6 w-80 flex justify-center relative"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <button
-                  onClick={() => navigate("/loginsignup", { replace: true })}
-                  className="bg-pink-500 text-white font-semibold px-4 py-2 rounded hover:bg-pink-600 transition"
-                >
-                  Sign In
-                </button>
-              </div>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );
