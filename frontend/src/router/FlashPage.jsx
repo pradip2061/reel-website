@@ -8,7 +8,7 @@ const FlashPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-      checkToken();        
+      checkToken()        
   }, []);
 
   const checkToken = async () => {
