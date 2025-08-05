@@ -120,6 +120,43 @@ const VideoPlayer = ({ video }) => {
     setIsLiked(likedvideos.includes(video._id));
   }, [likedvideos, video._id]);
 
+  /** ✅ Handle back button on mobile */
+  useEffect(() => {
+    const handlePopState = (e) => {
+      if (showcomment || showShareModal) {
+        if (showcomment) {
+          setShowComment(false);
+        } else if (showShareModal) {
+          setShowShareModal(false);
+        }
+        e.preventDefault();
+        return;
+      }
+    };
+
+    if (window.matchMedia("(max-width: 768px)").matches) {
+      window.addEventListener("popstate", handlePopState);
+    }
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [showcomment, showShareModal]);
+
+  const openComments = () => {
+    if (!showcomment) {
+      window.history.pushState(null, "", window.location.href);
+    }
+    setShowComment(true);
+  };
+
+  const openShare = () => {
+    if (!showShareModal) {
+      window.history.pushState(null, "", window.location.href);
+    }
+    setShowShareModal(true);
+  };
+
   const onClose = () => setShowComment(false);
   const shareUrl = `${window.location.origin}/getsinglevideo/${video._id}`;
 
@@ -198,11 +235,11 @@ const VideoPlayer = ({ video }) => {
             <Heart size={28} className={`transition ${isLiked ? "text-pink-500 fill-pink-500" : "text-white"}`} />
             <span className="text-xs">{likecount}</span>
           </button>
-          <button onClick={() => setShowComment((prev) => !prev)} className="flex flex-col items-center">
+          <button onClick={openComments} className="flex flex-col items-center">
             <MessageCircle size={28} />
             <span className="text-xs">{commentcount}</span>
           </button>
-          <button onClick={() => setShowShareModal(true)} className="flex flex-col items-center">
+          <button onClick={openShare} className="flex flex-col items-center">
             <Share2 size={28} />
             <span className="text-xs">Share</span>
           </button>
@@ -239,8 +276,35 @@ const VideoPlayer = ({ video }) => {
           <CommentSection
             videoId={video._id}
             onClose={onClose}
-            onNewComment={() => setCommentCount((prev) => prev + 1)} // ✅ Update dynamically
+            onNewComment={() => setCommentCount((prev) => prev + 1)}
           />
+        )}
+
+        {/* Share Modal */}
+        {showShareModal && (
+          <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+            <div className="bg-white text-black rounded-xl p-6 w-80 shadow-lg relative">
+              <h2 className="text-lg font-semibold mb-3">Share Video</h2>
+              <input
+                type="text"
+                value={shareUrl}
+                readOnly
+                className="w-full border p-2 rounded mb-3"
+              />
+              <button
+                onClick={handleCopyLink}
+                className="bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-600 w-full"
+              >
+                Copy Link
+              </button>
+              <button
+                onClick={() => setShowShareModal(false)}
+                className="absolute top-2 right-3 text-gray-600 hover:text-black"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
         )}
 
         {/* Seek Bar */}
