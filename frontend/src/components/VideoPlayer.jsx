@@ -21,8 +21,8 @@ const VideoPlayer = ({ video }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [videoLoading, setVideoLoading] = useState(true);
 
-  const [likecount, setLikeCount] = useState(video.isLiked.length);
-  const [commentcount, setCommentCount] = useState(video.comments.length);
+  const [likecount, setLikeCount] = useState(video?.isliked?.length);
+  const [commentcount, setCommentCount] = useState(video?.comments?.length);
 
   const { userid, following } = useSelector((state) => state.login);
   const isLogin = localStorage.getItem("isLogin");
