@@ -12,6 +12,7 @@ import { addFollowing, removeFollowing } from "../../store/login/LoginSlice";
 const VideoPlayer = ({ video }) => {
   const videoRef = useRef(null);
   const containerRef = useRef(null);
+
   const [muted, setMuted] = useState(false);
   const [progress, setProgress] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -19,15 +20,18 @@ const VideoPlayer = ({ video }) => {
   const [showShareModal, setShowShareModal] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [videoLoading, setVideoLoading] = useState(true);
+
+  const [likecount, setLikeCount] = useState(video.isLiked.length);
+  const [commentcount, setCommentCount] = useState(video.comments.length);
+
   const { userid, following } = useSelector((state) => state.login);
   const isLogin = localStorage.getItem("isLogin");
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const likedvideos = useSelector((state) => state.like?.likevideos ?? []);
-  const [follow, setFollow] = useState(false);
+
   const toggleMute = () => setMuted((m) => !m);
-  const[likecount,setLikeCount]=useState(video.isLiked.length)
- const[commentcount,setCommentCount]=useState(video.comments.length)
+
   const handleTimeUpdate = () => {
     if (!videoRef.current) return;
     const { currentTime = 0, duration = 1 } = videoRef.current;
@@ -44,10 +48,7 @@ const VideoPlayer = ({ video }) => {
   const handlePlayPause = () => {
     if (!videoRef.current) return;
     if (videoRef.current.paused) {
-      videoRef.current
-        .play()
-        .then(() => setPlaying(true))
-        .catch(() => {});
+      videoRef.current.play().then(() => setPlaying(true)).catch(() => {});
     } else {
       videoRef.current.pause();
       setPlaying(false);
@@ -56,15 +57,16 @@ const VideoPlayer = ({ video }) => {
 
   const handleLike = (id) => {
     if (!isLogin) {
-      toast.info("first login your account.");
+      toast.info("Please login to like videos.");
       return;
     }
-    setIsLiked((prev) => !prev);
-    if(isLiked){
-      setLikeCount((prev)=>prev+1)
-    }else{
-           setLikeCount((prev)=>prev-1)
-    }
+
+    setIsLiked((prev) => {
+      const newValue = !prev;
+      setLikeCount((count) => (newValue ? count + 1 : count - 1));
+      return newValue;
+    });
+
     dispatch(likeThunk(id));
   };
 
@@ -76,9 +78,7 @@ const VideoPlayer = ({ video }) => {
       );
       if (status === 200) {
         const serverLikes = data.likedvideos?.likedvideos ?? [];
-        const localSorted = [...likedvideos].sort();
-        const serverSorted = [...serverLikes].sort();
-        if (JSON.stringify(localSorted) !== JSON.stringify(serverSorted)) {
+        if (JSON.stringify([...likedvideos].sort()) !== JSON.stringify([...serverLikes].sort())) {
           dispatch(setdataLike(serverLikes));
         }
       }
@@ -92,10 +92,7 @@ const VideoPlayer = ({ video }) => {
       ([entry]) => {
         if (!videoRef.current) return;
         if (entry.isIntersecting) {
-          videoRef.current
-            .play()
-            .then(() => setPlaying(true))
-            .catch(() => {});
+          videoRef.current.play().then(() => setPlaying(true)).catch(() => {});
         } else {
           videoRef.current.pause();
           setPlaying(false);
@@ -116,10 +113,7 @@ const VideoPlayer = ({ video }) => {
   }, []);
 
   useEffect(() => {
-    if (!isLogin) {
-      return;
-    }
-    refreshLikedVideos();
+    if (isLogin) refreshLikedVideos();
   }, []);
 
   useEffect(() => {
@@ -138,47 +132,35 @@ const VideoPlayer = ({ video }) => {
     }
   };
 
-  const handleprofile = () => {
-    if (userid === video.userid) {
-      navigate("/userprofile");
-    } else {
-      navigate(`/visitprofile/${video?.userid}`);
-    }
+  const handleProfile = () => {
+    if (userid === video.userid) navigate("/userprofile");
+    else navigate(`/visitprofile/${video?.userid}`);
   };
 
   const isFollowing = following.includes(video.userid);
 
-  const handlefollowandfollowing = async (userid) => {
+  const handleFollowAndFollowing = async (userid) => {
     if (!isLogin) {
       toast.info("Please login to follow or unfollow.");
       return;
     }
-    if (isFollowing) {
-      dispatch(removeFollowing(userid));
-    } else {
-      dispatch(addFollowing(userid));
-    }
+    if (isFollowing) dispatch(removeFollowing(userid));
+    else dispatch(addFollowing(userid));
+
     try {
-      const response = await axios.post(
+      await axios.post(
         `${import.meta.env.VITE_BASE_URL}/handlefollowandfollowing`,
         { userid },
         { withCredentials: true }
       );
-      console.log(response);
     } catch (err) {
-      console.error(
-        "Follow/unfollow error:",
-        err?.response?.data?.message ?? err
-      );
+      console.error("Follow/unfollow error:", err?.response?.data?.message ?? err);
       toast.error("Something went wrong. Try again.");
     }
   };
 
   return (
-    <div
-      ref={containerRef}
-      className="w-full h-full flex items-center justify-center bg-black"
-    >
+    <div ref={containerRef} className="w-full h-full flex items-center justify-center bg-black">
       <div className="relative w-full h-full max-w-md mx-auto bg-black text-white overflow-hidden">
         {/* Loading Spinner */}
         {videoLoading && (
@@ -199,44 +181,28 @@ const VideoPlayer = ({ video }) => {
           crossOrigin="anonymous"
           onCanPlay={() => setVideoLoading(false)}
           onLoadedData={() => setVideoLoading(false)}
-          className={`w-full h-full object-contain cursor-pointer ${
-            videoLoading ? "invisible" : "visible"
-          }`}
+          className={`w-full h-full object-contain cursor-pointer ${videoLoading ? "invisible" : "visible"}`}
         />
 
         {/* Mute Button */}
         <button
           onClick={toggleMute}
-          className="absolute lg:top-16  top-14  right-4 p-2 rounded-full bg-white/20 hover:bg-white/30 z-30"
+          className="absolute lg:top-16 top-14 right-4 p-2 rounded-full bg-white/20 hover:bg-white/30 z-30"
         >
           {muted ? <VolumeX size={20} /> : <Volume2 size={20} />}
         </button>
 
         {/* Right-side Buttons */}
         <div className="absolute bottom-44 right-4 flex flex-col items-center space-y-4 z-10">
-          <button
-            onClick={() => handleLike(video._id)}
-            className="flex flex-col items-center"
-          >
-            <Heart
-              size={28}
-              className={`transition ${
-                isLiked ? "text-pink-500 fill-pink-500" : "text-white"
-              }`}
-            />
+          <button onClick={() => handleLike(video._id)} className="flex flex-col items-center">
+            <Heart size={28} className={`transition ${isLiked ? "text-pink-500 fill-pink-500" : "text-white"}`} />
             <span className="text-xs">{likecount}</span>
           </button>
-          <button
-            onClick={() => setShowComment((prev) => !prev)}
-            className="flex flex-col items-center"
-          >
+          <button onClick={() => setShowComment((prev) => !prev)} className="flex flex-col items-center">
             <MessageCircle size={28} />
             <span className="text-xs">{commentcount}</span>
           </button>
-          <button
-            onClick={() => setShowShareModal(true)}
-            className="flex flex-col items-center"
-          >
+          <button onClick={() => setShowShareModal(true)} className="flex flex-col items-center">
             <Share2 size={28} />
             <span className="text-xs">Share</span>
           </button>
@@ -248,18 +214,16 @@ const VideoPlayer = ({ video }) => {
             src={video.profilepic || "https://via.placeholder.com/40"}
             alt=""
             className="w-10 h-10 rounded-full border-2 border-white cursor-pointer"
-            onClick={handleprofile}
+            onClick={handleProfile}
           />
           <div className="flex flex-col">
-            <h3 className="font-bold text-pink-500">
-              {video.Name || "Unknown"}
-            </h3>
+            <h3 className="font-bold text-pink-500">{video.Name || "Unknown"}</h3>
             <p className="text-sm">{video.Title || "No Title"}</p>
           </div>
           {userid !== video.userid && (
             <button
-              onClick={() => handlefollowandfollowing(video.userid)}
-              className={`ml-4 px-4 py-1  mb-4 rounded-full text-sm font-semibold transition ${
+              onClick={() => handleFollowAndFollowing(video.userid)}
+              className={`ml-4 px-4 py-1 mb-4 rounded-full text-sm font-semibold transition ${
                 isFollowing
                   ? "bg-white text-black border border-gray-300 hover:bg-gray-200"
                   : "bg-pink-500 text-white hover:bg-pink-600"
@@ -269,10 +233,16 @@ const VideoPlayer = ({ video }) => {
             </button>
           )}
         </div>
+
         {/* Comment Section */}
         {showcomment && (
-          <CommentSection videoId={video._id} onClose={onClose} />
+          <CommentSection
+            videoId={video._id}
+            onClose={onClose}
+            onNewComment={() => setCommentCount((prev) => prev + 1)} // ✅ Update dynamically
+          />
         )}
+
         {/* Seek Bar */}
         <div className="absolute w-full px-4 bottom-28 lg:bottom-5 z-10">
           <input
@@ -284,77 +254,6 @@ const VideoPlayer = ({ video }) => {
             className="w-full h-1 rounded-full bg-white/20 accent-pink-500"
           />
         </div>
-
-        {/* Share Modal */}
-        {showShareModal && (
-          <div
-            className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center"
-            onClick={() => setShowShareModal(false)}
-          >
-            {isLogin ? (
-              <div
-                className="bg-white rounded-xl p-6 w-80 space-y-4 relative"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <button
-                  className="absolute top-2 right-2 text-black text-lg"
-                  onClick={() => setShowShareModal(false)}
-                >
-                  ❌
-                </button>
-                <h2 className="text-lg font-semibold text-black text-center">
-                  Share this video
-                </h2>
-
-                <button
-                  onClick={handleCopyLink}
-                  className="w-full bg-pink-500 text-white py-2 rounded-lg hover:bg-pink-600"
-                >
-                  📋 Copy Link
-                </button>
-
-                <div className="flex justify-around mt-2">
-                  <a
-                    href={`https://wa.me/?text=${encodeURIComponent(shareUrl)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <img
-                      src="https://img.icons8.com/color/48/whatsapp--v1.png"
-                      alt="WhatsApp"
-                      className="w-10 h-10"
-                    />
-                  </a>
-                  <a
-                    href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-                      shareUrl
-                    )}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <img
-                      src="https://img.icons8.com/color/48/facebook-new.png"
-                      alt="Facebook"
-                      className="w-10 h-10"
-                    />
-                  </a>
-                </div>
-              </div>
-            ) : (
-              <div
-                className="bg-white rounded-xl p-6 w-80 flex justify-center relative"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <button
-                  onClick={() => navigate("/loginsignup", { replace: true })}
-                  className="bg-pink-500 text-white font-semibold px-4 py-2 rounded hover:bg-pink-600 transition"
-                >
-                  Sign In
-                </button>
-              </div>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );
