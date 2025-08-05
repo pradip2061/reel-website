@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Send, Reply, X,Loader2 } from "lucide-react";
+import { Send, Reply, X, Loader2 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { commentThunk } from "../../store/comment/commentThunk";
 import { RefreshComment, setComment } from "../../store/comment/commentSlice";
@@ -12,15 +12,16 @@ const CommentSection = ({ onClose, videoId }) => {
   const [replyingTo, setReplyingTo] = useState(null);
   const [reply, setReply] = useState({});
   const [expandedReplies, setExpandedReplies] = useState({});
-  const[loading,setLoading]=useState(false)
-    const[loadingComment,setLoadingComment]=useState(false)
-  const[replyLoading,setReplyLoading]=useState(false)
-  const userid = useSelector((state)=>state.login.userid)
+  const [loading, setLoading] = useState(false);
+  const [loadingComment, setLoadingComment] = useState(false);
+  const [replyLoading, setReplyLoading] = useState(false);
+
+  const userid = useSelector((state) => state.login.userid);
   const isLogin = localStorage.getItem("isLogin") === "true";
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
-  const { comments, error,status } = useSelector((state) => state.comment);
+  const { comments, error, status } = useSelector((state) => state.comment);
 
   const handleSubmitComment = async (e) => {
     e.preventDefault();
@@ -37,10 +38,10 @@ const CommentSection = ({ onClose, videoId }) => {
 
   const getComments = async () => {
     try {
-        if (!isLogin) {
-      return;
-    }
-    setLoadingComment(true)
+      if (!isLogin) {
+        return;
+      }
+      setLoadingComment(true);
       const res = await axios.get(
         `${import.meta.env.VITE_BASE_URL}/getcomment?videoid=${videoId}`,
         { withCredentials: true }
@@ -50,15 +51,15 @@ const CommentSection = ({ onClose, videoId }) => {
       }
     } catch (err) {
       console.error("Fetch comments error:", err?.response?.data?.message || err);
-    }finally{
-      setLoadingComment(false)
+    } finally {
+      setLoadingComment(false);
     }
   };
 
   const handleReply = async (commentId) => {
     const message = reply[commentId]?.trim();
     if (!message) return;
-    setReplyLoading(true)
+    setReplyLoading(true);
     try {
       const res = await axios.post(
         `${import.meta.env.VITE_BASE_URL}/replycomment`,
@@ -72,14 +73,14 @@ const CommentSection = ({ onClose, videoId }) => {
       }
     } catch (err) {
       console.error("Reply error:", err?.response?.data?.message || err);
-    }finally{
-      setReplyLoading(false)
+    } finally {
+      setReplyLoading(false);
     }
   };
 
   const deleteReplyOrComment = async (commentId, replyId = null) => {
     try {
-      setLoading(true)
+      setLoading(true);
       const res = await axios.post(
         `${import.meta.env.VITE_BASE_URL}/deletereplyorcomment`,
         { commentId, videoId, replyId },
@@ -90,8 +91,8 @@ const CommentSection = ({ onClose, videoId }) => {
       }
     } catch (err) {
       console.error("Delete error:", err?.response?.data?.message || err);
-    }finally{
-      setLoading(false)
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -108,35 +109,29 @@ const CommentSection = ({ onClose, videoId }) => {
     const isExpanded = expandedReplies[comment._id] || false;
     const replyCount = comment.reply?.length || 0;
 
-     const handleprofile = ()=>{
-    if(userid === comment.userid){
-      navigate('/userprofile')
-    }else{
-         navigate(`/visitprofile/${comment?.userid}`)
-    }
- 
-  }
-  if(loadingComment){
-    return<div>
-      <Loader2 size={32} color="black"/>
-    </div>
-  }
+    const handleprofile = () => {
+      if (userid === comment.userid) {
+        navigate("/userprofile");
+      } else {
+        navigate(`/visitprofile/${comment?.userid}`);
+      }
+    };
 
-   const handlereplyprofile = (id)=>{
-    if(userid === id){
-      navigate('/userprofile')
-    }else{
-         navigate(`/visitprofile/${id}`)
-    }
- 
-  }
+    const handlereplyprofile = (id) => {
+      if (userid === id) {
+        navigate("/userprofile");
+      } else {
+        navigate(`/visitprofile/${id}`);
+      }
+    };
+
     return (
       <div className="mb-5 flex space-x-3 items-start text-black">
         <img
           src={comment.profilepic}
           alt="user profile"
           className="rounded-full w-10 h-10 flex-shrink-0"
-           onClick={handleprofile}
+          onClick={handleprofile}
         />
         <div className="flex-1">
           <div className="bg-gray-100 rounded-xl p-3">
@@ -173,7 +168,7 @@ const CommentSection = ({ onClose, videoId }) => {
 
             {comment.userid === userid && (
               <button
-                className={` ${loading ? 'text-red-300' : 'text-red-500'} mt-2 text-sm `}
+                className={` ${loading ? "text-red-300" : "text-red-500"} mt-2 text-sm `}
                 onClick={() => deleteReplyOrComment(comment._id)}
                 disabled={loading}
               >
@@ -189,14 +184,14 @@ const CommentSection = ({ onClose, videoId }) => {
                   src={item.profilepic}
                   alt="reply profile"
                   className="w-8 h-8 rounded-full"
-                   onClick={()=>handlereplyprofile(item.userid)}
+                  onClick={() => handlereplyprofile(item.userid)}
                 />
                 <div className="flex-1 bg-gray-50 rounded-lg border border-gray-200 p-3">
                   <h4 className="text-sm font-semibold">{item.username}</h4>
                   <p className="text-sm text-gray-700 mt-1">{item.message}</p>
                   {item.userid === userid && (
                     <button
-                      className={` ${loading ? 'text-red-300' : 'text-red-500'} mt-2 text-sm `}
+                      className={` ${loading ? "text-red-300" : "text-red-500"} mt-2 text-sm `}
                       onClick={() => deleteReplyOrComment(comment._id, item._id)}
                     >
                       Delete
@@ -231,7 +226,7 @@ const CommentSection = ({ onClose, videoId }) => {
                 </button>
                 <button
                   onClick={() => handleReply(comment._id)}
-                  className={`px-3 py-1 ${replyLoading ? 'bg-red-300':'bg-red-600'}  text-white rounded-lg`}
+                  className={`px-3 py-1 ${replyLoading ? "bg-red-300" : "bg-red-600"}  text-white rounded-lg`}
                   disabled={replyLoading}
                 >
                   Reply
@@ -269,7 +264,12 @@ const CommentSection = ({ onClose, videoId }) => {
         ) : (
           <>
             <div className="flex-1 overflow-y-auto px-4 py-2 space-y-4">
-              {comments.length > 0 ? (
+              {loadingComment ? (
+                <div className="flex justify-center items-center mt-10">
+                  <Loader2 className="animate-spin w-6 h-6 text-gray-500" />
+                  <span className="ml-2 text-gray-500">Loading comments...</span>
+                </div>
+              ) : comments.length > 0 ? (
                 comments.map((comment) => (
                   <CommentItem key={comment._id} comment={comment} />
                 ))
@@ -294,7 +294,7 @@ const CommentSection = ({ onClose, videoId }) => {
               />
               <button
                 type="submit"
-                disabled={!newComment.trim() || status === 'pending'}
+                disabled={!newComment.trim() || status === "pending"}
                 className="bg-red-600 px-4 py-2 rounded-full text-white disabled:opacity-50"
               >
                 <Send className="w-5 h-5" />
