@@ -1,8 +1,9 @@
 import React from "react";
-import { Home, Upload, User, Smile, Book, Frown,Heart } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Home, Upload, User, Smile, Book, Frown, Heart } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { setCategory } from "../../store/getvideo/getvideoSlice"; // import the new action
+import { setCategory } from "../../store/getvideo/getvideoSlice";
+import { getvideoThunk } from "../../store/getvideo/getvideoThunk"; // Make sure this import exists
 
 const categories = [
   { label: "All", icon: <Home size={18} />, key: "All" },
@@ -14,23 +15,32 @@ const categories = [
 
 const Nav = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
 
-   const {currentPage, limit,category} = useSelector(
-      (state) => state.getvideo
-    );
+  const { currentPage, limit, category } = useSelector(
+    (state) => state.getvideo
+  );
 
   const selectCategory = (label) => {
-    // Dispatch category as lowercase key to keep consistent
     dispatch(setCategory(label));
+    dispatch(getvideoThunk({ category: label, page: 1, limit }));
+
+    if (location.pathname !== "/home") {
+      navigate("/home");
+    }
   };
 
- const videoget =()=>{
+  const videoget = () => {
+    if (location.pathname !== "/home") {
+      navigate("/home");
+      setTimeout(() => {
+        dispatch(getvideoThunk({ category, page: currentPage, limit }));
+      }, 100);
+    } else {
       dispatch(getvideoThunk({ category, page: currentPage, limit }));
-      navigate("/home")
- }
-
-
+    }
+  };
 
   return (
     <>
@@ -44,7 +54,7 @@ const Nav = () => {
                 key={cat.key}
                 onClick={() => selectCategory(cat.label)}
                 className={`flex items-center px-3 py-1 rounded-full text-sm ${
-                  cat.key === category
+                  cat.label.toLowerCase() === category.toLowerCase()
                     ? "bg-pink-500 text-white"
                     : "hover:text-pink-400"
                 }`}
@@ -80,7 +90,7 @@ const Nav = () => {
             key={cat.key}
             onClick={() => selectCategory(cat.label)}
             className={`flex items-center px-3 py-1 rounded-full text-sm whitespace-nowrap ${
-              cat.key === category
+              cat.label.toLowerCase() === category.toLowerCase()
                 ? "bg-pink-500 text-white"
                 : "hover:text-pink-400"
             }`}

@@ -1,33 +1,35 @@
 import React, { useEffect, useRef, useState } from "react";
 import VideoCard from "../components/VideoPlayer";
 import { useDispatch, useSelector } from "react-redux";
-import { getvideoThunk } from "../../store/getvideo/getvideoThunk";
-import { nextPage } from "../../store/getvideo/getvideoSlice";
 import { ChevronDown } from "lucide-react";
+import axios from "axios";
 
 const Home = () => {
   const containerRef = useRef(null);
-  const dispatch = useDispatch();
-
-  const { videos, currentPage, totalPages, status, limit,category} = useSelector(
-    (state) => state.getvideo
-  );
+  const debounceTimer = useRef(null);
+  const [videos, setVideos] = useState([]);
   const [visibleIndex, setVisibleIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Fetch videos when category or currentPage changes
-  useEffect(() => {
-    dispatch(getvideoThunk({ category, page: currentPage, limit }));
-  }, [dispatch, category, currentPage, limit]);
-
-  const handleLoadMore = () => {
-    if (currentPage < totalPages) {
-      dispatch(nextPage());
+  // Fetch 10 random videos
+  const fetchRandomVideos = async () => {
+    try {
+      setIsLoading(true);
+      const res = await axios.get("/api/videos/random");
+      setVideos((prev) => [...prev, ...res.data]); // Append new videos
+    } catch (err) {
+      console.error("Error fetching videos", err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Debounce timer ref
-  const debounceTimer = useRef(null);
+  // Initial load
+  useEffect(() => {
+    fetchRandomVideos();
+  }, []);
 
+  // Observer to detect which video is visible
   useEffect(() => {
     if (!containerRef.current) return;
 
@@ -41,11 +43,15 @@ const Home = () => {
         if (entry.isIntersecting) {
           const index = Number(entry.target.getAttribute("data-index"));
 
-          // Debounce setVisibleIndex to avoid flickering
           if (debounceTimer.current) clearTimeout(debounceTimer.current);
           debounceTimer.current = setTimeout(() => {
             setVisibleIndex(index);
-          }, 100); // 100ms debounce delay
+
+            // If last video is visible, fetch more
+            if (index === videos.length - 1) {
+              fetchRandomVideos();
+            }
+          }, 100);
         }
       });
     }, options);
@@ -57,67 +63,29 @@ const Home = () => {
       elements.forEach((el) => observer.unobserve(el));
       if (debounceTimer.current) clearTimeout(debounceTimer.current);
     };
-  }, [videos.length]);
-
-  // DEBUG: Show current state in console
-  console.log({ currentPage, totalPages, videosLength: videos?.length });
-
-  if (status === "loading") {
-    return (
-      <div className="w-[400px] h-[600px] mx-auto p-2 pt-20">
-        <div className="bg-white rounded-xl overflow-hidden shadow animate-pulse h-full w-full flex flex-col">
-          {/* Top Text */}
-          <div className="bg-gray-300 h-5 w-3/4 mx-auto mt-3 rounded"></div>
-
-          {/* Video Placeholder */}
-          <div className="bg-gray-300 flex-1 w-full mt-3"></div>
-
-          {/* Bottom Section */}
-          <div className="p-3 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              {/* Profile */}
-              <div className="bg-gray-300 h-8 w-8 rounded-full"></div>
-              <div>
-                <div className="bg-gray-300 h-3 w-20 rounded mb-1"></div>
-                <div className="bg-gray-300 h-2 w-12 rounded"></div>
-              </div>
-            </div>
-
-            {/* Icons */}
-            <div className="flex flex-col gap-3 items-center">
-              <div className="bg-gray-300 h-5 w-5 rounded-full"></div>
-              <div className="bg-gray-300 h-5 w-5 rounded-full"></div>
-              <div className="bg-gray-300 h-5 w-5 rounded-full"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  }, [videos]);
 
   return (
     <div
       ref={containerRef}
       className="h-screen overflow-y-scroll snap-y snap-mandatory relative"
     >
-      {videos?.map((video, index) => (
+      {videos.map((video, index) => (
         <div
-          key={video._id}
+          key={`${video._id}-${index}`}
           className="video-slide snap-start snap-always relative"
           data-index={index}
           style={{ height: "100vh" }}
         >
           <VideoCard video={video} active={index === visibleIndex} />
 
-          {(index === videos?.length - 1 && currentPage < totalPages) && (
-            <div
-              className="absolute bottom-60 left-1/2 transform -translate-x-1/2 z-50"
-            >
+          {index === videos.length - 1 && isLoading && (
+            <div className="absolute bottom-60 left-1/2 transform -translate-x-1/2 z-50">
               <button
-                onClick={handleLoadMore}
-                className="flex items-center bg-pink-500 px-4 py-2 rounded text-white text-sm font-bold shadow-lg focus:outline-none"
+                disabled
+                className="flex items-center bg-pink-500 px-4 py-2 rounded text-white text-sm font-bold shadow-lg"
               >
-                Load More <ChevronDown className="ml-1 w-4 h-4" />
+                Loading... <ChevronDown className="ml-1 w-4 h-4 animate-bounce" />
               </button>
             </div>
           )}
