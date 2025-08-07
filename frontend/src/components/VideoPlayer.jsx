@@ -218,6 +218,7 @@ const VideoPlayer = ({ video }) => {
           crossOrigin="anonymous"
           onCanPlay={() => setVideoLoading(false)}
           onLoadedData={() => setVideoLoading(false)}
+          onWaiting={()=>setVideoLoading(false)}
           className={`w-full h-full object-contain cursor-pointer ${videoLoading ? "invisible" : "visible"}`}
         />
 
