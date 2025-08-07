@@ -15,6 +15,7 @@ const FlashPage = () => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/verifytoken`, {
         withCredentials: true,
+          timeout: 5000
       });
 
       if (response.status === 200) {

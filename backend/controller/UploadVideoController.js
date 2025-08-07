@@ -88,6 +88,44 @@ const getvideo = async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
+const getvideo = async (req, res) => {
+  try {
+    const { category, limit } = req.query;
+
+    if (!category) {
+      return res.status(400).json({ message: "Category is missing!" });
+    }
+
+    const limitNumber = parseInt(limit) || 10;
+
+    let videos, totalVideos;
+
+    if (category === "All") {
+      totalVideos = await video.countDocuments();
+      videos = await video.aggregate([
+        { $sample: { size: limitNumber } }
+      ]);
+    } else {
+      totalVideos = await video.countDocuments({ category });
+      videos = await video.aggregate([
+        { $match: { category } },
+        { $sample: { size: limitNumber } }
+      ]);
+    }
+
+    return res.status(200).json({
+      videos,
+      totalVideos,
+      currentPage: 1,
+      totalPages: 1,
+      limit: limitNumber
+    });
+
+  } catch (error) {
+    console.error("Error fetching videos:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
 
 
 const deletevideo = async (req, res) => {

@@ -98,7 +98,7 @@ const totalComments = video.reduce((sum, v) => sum + (v.comments?.length || 0), 
               <div className="mt-4 flex flex-wrap justify-center sm:justify-start gap-4 text-sm">
                 <div className="flex items-center gap-2">
                   <Users size={16} />
-                  <span onClick={()=>navigate('/getuser', { state: { ids: info.following ,data:'following'} })}>{info?.followers.length?.toLocaleString() || 0} followers</span>
+                  <span onClick={()=>navigate('/getuser', { state: { ids: info.following ,data:'followers'} })}>{info?.followers.length?.toLocaleString() || 0} followers</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <UserPlus size={16} />
