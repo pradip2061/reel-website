@@ -111,7 +111,7 @@ const Home = () => {
 
           {(index === videos?.length - 1 && currentPage < totalPages) && (
             <div
-              className="absolute bottom-40 left-1/2 transform -translate-x-1/2 z-50"
+              className="absolute bottom-60 left-1/2 transform -translate-x-1/2 z-50"
             >
               <button
                 onClick={handleLoadMore}
