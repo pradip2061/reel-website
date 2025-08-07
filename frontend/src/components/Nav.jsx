@@ -24,7 +24,7 @@ const Nav = () => {
 
   const selectCategory = (label) => {
     dispatch(setCategory(label));
-    dispatch(getvideoThunk({ category: label, page: 1, limit }));
+    dispatch(getvideoThunk({ category: label, limit }));
 
     if (location.pathname !== "/home") {
       navigate("/home");
@@ -35,10 +35,10 @@ const Nav = () => {
     if (location.pathname !== "/home") {
       navigate("/home");
       setTimeout(() => {
-        dispatch(getvideoThunk({ category, page: currentPage, limit }));
+        dispatch(getvideoThunk({ category, limit }));
       }, 100);
     } else {
-      dispatch(getvideoThunk({ category, page: currentPage, limit }));
+      dispatch(getvideoThunk({ category, limit }));
     }
   };
 

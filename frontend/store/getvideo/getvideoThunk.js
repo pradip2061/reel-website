@@ -4,19 +4,16 @@ import axios from 'axios';
 
 export const getvideoThunk = createAsyncThunk(
   'getvideo/getvideoThunk',
-  async ({ category, page, limit}, { rejectWithValue }) => {
+  async ({ category,limit}, { rejectWithValue }) => {
     try {
       const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/getvideo`, {
-        params: { category, page, limit }
+        params: { category, limit }
       });
 
       if (response.status === 200) {
          console.log(response)
         return {
-          videos: response.data.videos,
-          hasMore: response.data.hasMore || false ,
-          totalPages:response.data.totalPages,
-          currentPage:response.data.currentPage
+          videos: response.data.videos
         };
       }
     } catch (error) {

@@ -8,43 +8,16 @@ const getvideo = createSlice({
     status: null,
     message: "",
     videos: [],
-    currentPage: 1,
-    totalPages: 0,
-    limit: 16,
-    category: "All",  // add default category here, lowercase recommended
+    category: "All",  // optional if you still want to filter by category
   },
   reducers: {
-    setVideos: (state, action) => {
-      state.videos = action.payload.videos;
-      state.totalPages = action.payload.totalPages;
-      state.currentPage = action.payload.currentPage;
-    },
     resetVideos: (state) => {
       state.videos = [];
-      state.currentPage = 1;
-      state.totalPages = 0;
-    },
-    nextPage: (state) => {
-      if (state.currentPage < state.totalPages) {
-        state.currentPage += 1;
-      }
-    },
-    prevPage: (state) => {
-      if (state.currentPage > 1) {
-        state.currentPage -= 1;
-      }
-    },
-    setPage: (state, action) => {
-      state.currentPage = action.payload;
     },
     setCategory: (state, action) => {
-      // Only change if different to avoid unnecessary reset
       if (state.category !== action.payload) {
-        console.log(action.payload)
         state.category = action.payload;
         state.videos = [];
-        state.currentPage = 1;
-        state.totalPages = 0;
       }
     },
   },
@@ -58,20 +31,11 @@ const getvideo = createSlice({
         state.status = "success";
         state.error = null;
 
-        if (state.currentPage === 1) {
-          // Replace videos on first page
-          state.videos = action.payload.videos;
-        } else {
-          // Append unique videos on next pages
-          const newVideoIds = new Set(state.videos?.map((v) => v._id));
-          const filtered = action.payload.videos?.filter(
-            (v) => !newVideoIds.has(v._id)
-          );
-          state.videos = [...state.videos, ...filtered];
-        }
+        // Ensure uniqueness when appending videos
+        const existingIds = new Set(state.videos.map((v) => v._id));
+        const newVideos = action.payload?.filter((v) => !existingIds.has(v._id));
 
-        state.totalPages = action.payload.totalPages;
-        state.currentPage = action.payload.currentPage;
+        state.videos.push(...newVideos);
       })
       .addCase(getvideoThunk.rejected, (state, action) => {
         state.status = "failed";
@@ -80,13 +44,6 @@ const getvideo = createSlice({
   },
 });
 
-export const {
-  setVideos,
-  resetVideos,
-  nextPage,
-  prevPage,
-  setPage,
-  setCategory,
-} = getvideo.actions;
+export const { resetVideos, setCategory } = getvideo.actions;
 
 export default getvideo.reducer;
