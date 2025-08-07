@@ -31,9 +31,8 @@ const getvideo = createSlice({
         state.status = "success";
         state.error = null;
 
-        // Ensure uniqueness when appending videos
         const existingIds = new Set(state.videos.map((v) => v._id));
-        const newVideos = action.payload?.filter((v) => !existingIds.has(v._id));
+        const newVideos = action.payload?.videos?.filter((v) => !existingIds.has(v._id));
 
         state.videos.push(...newVideos);
       })

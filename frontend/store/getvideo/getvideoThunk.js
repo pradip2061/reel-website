@@ -14,7 +14,6 @@ export const getvideoThunk = createAsyncThunk(
       );
 
       if (response.status === 200) {
-        console.log(response);
         return {
           videos: response.data.videos,
         };
