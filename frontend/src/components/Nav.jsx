@@ -16,13 +16,21 @@ const Nav = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // get category from redux store instead of local state
-  const category = useSelector((state) => state.getvideo.category);
+   const {currentPage, limit,category} = useSelector(
+      (state) => state.getvideo
+    );
 
   const selectCategory = (label) => {
     // Dispatch category as lowercase key to keep consistent
     dispatch(setCategory(label));
   };
+
+ const videoget =()=>{
+      dispatch(getvideoThunk({ category, page: currentPage, limit }));
+      navigate("/home")
+ }
+
+
 
   return (
     <>
@@ -87,7 +95,7 @@ const Nav = () => {
       <div className="md:hidden fixed z-20 bottom-0 left-0 w-full bg-black flex justify-between px-8 py-2 text-white">
         <button
           className="flex flex-col items-center text-xs"
-          onClick={() => navigate("/home")}
+          onClick={videoget}
         >
           <Home size={20} />
           <span>Home</span>
