@@ -8,7 +8,7 @@ const getvideo = createSlice({
     status: null,
     message: "",
     videos: [],
-    category: "All",  // optional if you still want to filter by category
+    category: "All",  
   },
   reducers: {
     resetVideos: (state) => {
