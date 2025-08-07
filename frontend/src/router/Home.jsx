@@ -8,10 +8,9 @@ import { getvideoThunk } from "../../store/getvideo/getvideoThunk";
 const Home = () => {
   const containerRef = useRef(null);
   const debounceTimer = useRef(null);
-  const [videos, setVideos] = useState([]);
   const [visibleIndex, setVisibleIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const {limit, category } = useSelector(
+  const {limit, category,videos } = useSelector(
     (state) => state.getvideo
   );
   const dispatch = useDispatch()
