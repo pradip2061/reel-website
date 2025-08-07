@@ -19,7 +19,7 @@ const Home = () => {
   const fetchRandomVideos = async () => {
     try {
       setIsLoading(true);
-      dispatch(getvideoThunk(category,limit))
+      dispatch(getvideoThunk({category,limit}))
     } catch (error) {
       console.error("Failed to fetch videos:", error);
     } finally {
