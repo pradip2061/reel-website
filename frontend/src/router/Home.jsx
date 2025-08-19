@@ -68,7 +68,7 @@ const Home = () => {
   }, [videos, isLoading]);
 
   // ⌛ Optional loading skeleton
-  if (videos.length === 0 && isLoading) {
+  if (videos.length === 0) {
     return (
       <div className="w-[400px] h-[600px] mx-auto p-2 pt-20">
         <div className="bg-white rounded-xl overflow-hidden shadow animate-pulse h-full w-full flex flex-col">

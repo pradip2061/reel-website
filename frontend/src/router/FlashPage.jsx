@@ -23,7 +23,6 @@ const FlashPage = () => {
       }
     } catch (error) {
       localStorage.removeItem("isLogin");
-      navigate("/loginsignup", { replace: true });
     }
   };
 
