@@ -18,7 +18,7 @@ const FlashPage = () => {
           timeout: 5000
       });
 
-      if (response.status === 200) {
+      if (response) {
         navigate("/home", { replace: true });
       }
     } catch (error) {
