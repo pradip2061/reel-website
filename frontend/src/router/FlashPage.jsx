@@ -1,35 +1,30 @@
 // src/pages/FlashPage.jsx
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios'
-import { useState } from 'react';
 
 const FlashPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-      checkToken()        
-  }, []);
+    const timer = setTimeout(() => {
+      navigate('/home', { replace: true });
+    }, 1500); // 1.5-second splash screen
 
-  const checkToken = async () => {
-    try {
-      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/verifytoken`, {
-        withCredentials: true,
-          timeout: 5000
-      });
-
-      if (response) {
-        navigate("/home", { replace: true });
-      }
-    } catch (error) {
-      localStorage.removeItem("isLogin");
-    }
-  };
+    return () => clearTimeout(timer); // cleanup
+  }, [navigate]);
 
   return (
     <div className="flex items-center justify-center h-screen w-screen bg-black text-white flex-col animate-fade-in">
-      <h1 className="text-4xl font-bold mb-4">🎬 vid <span className='text-pink-500'>Share</span></h1>
-      <p className="text-lg animate-pulse">Loading your experience...</p>
+      <h1 className="text-4xl sm:text-5xl font-bold mb-4 text-center">
+        🎬 vid <span className="text-pink-500">Share</span>
+      </h1>
+      <p
+        className="text-lg sm:text-xl animate-pulse text-center"
+        role="status"
+        aria-busy="true"
+      >
+        Loading your experience...
+      </p>
     </div>
   );
 };
